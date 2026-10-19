@@ -1,0 +1,20 @@
+window.GUIDE_PHOTOS = {
+  "ayasofya": "/static/photos/ayasofya.jpg",
+  "topkapi-sarayi": "/static/photos/topkapi-sarayi.jpg",
+  "yerebatan-sarnici": "/static/photos/yerebatan-sarnici.jpg",
+  "istanbul-arkeoloji-muzeleri": "/static/photos/istanbul-arkeoloji-muzeleri.jpg",
+  "galata-kulesi": "/static/photos/galata-kulesi.jpg",
+  "rahmi-koc-muzesi": "/static/photos/rahmi-koc-muzesi.jpg",
+  "sakip-sabanci-muzesi": "/static/photos/sakip-sabanci-muzesi.jpg",
+  "emirgan-korusu": "/static/photos/emirgan-korusu.jpg",
+  "moda-sahili": "/static/photos/moda-sahili.jpg",
+  "pera-muzesi": "/static/photos/pera-muzesi.jpg",
+  "masumiyet-muzesi": "/static/photos/masumiyet-muzesi.jpg",
+  "dolmabahce-sarayi": "/static/photos/dolmabahce-sarayi.jpg",
+  "pierreloti-tepesi": "/static/photos/pierreloti-tepesi.jpg",
+  "suleymaniye-camii": "/static/photos/suleymaniye-camii.jpg",
+  "istanbul-modern": "/static/photos/istanbul-modern.jpg",
+  "bogaz-vapuru": "/static/photos/bogaz-vapuru.jpg",
+  "galata-sokak": "/static/photos/galata-sokak.jpg",
+  "arkeoloji-salonu": "/static/photos/arkeoloji-salonu.jpg"
+};

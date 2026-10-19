@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#faf6ed" />
+    <meta name="description" content="İstanbul, Ankara ve İzmir'i merakının peşinden keşfet. Haritada durak bul, rotanı çiz ve gezi günlüğünü tut." />
+    <title>Şehir Arası — Bir şehir. Bin hikâye. Senin rotan.</title>
+    <link rel="preload" href="/static/photos/galata-sokak.jpg" as="image" />
+    <link rel="preload" href="/static/fonts/Manrope.ttf" as="font" type="font/ttf" crossorigin />
+    <link rel="stylesheet" href="/static/vendor/leaflet/leaflet.css" />
+    <link rel="stylesheet" href="/static/app.css?v=guide-2-2" />
+    <link rel="stylesheet" href="/static/features.css?v=guide-2-1" />
+    <script src="/static/photos.js?v=kultur-3-1" defer></script>
+    <script src="/static/city-photos.js?v=guide-2-1" defer></script>
+    <script src="/static/vendor/leaflet/leaflet.js" defer></script>
+    <script src="/static/features.js?v=guide-2-1" defer></script>
+    <script src="/static/app.js?v=guide-2-2" defer></script>
+  </head>
+  <body>
+    <svg class="svg-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <symbol id="i-tower" viewBox="0 0 36 58"><path d="M17 1h2v6l9 17H8l9-17V1Zm-7 26h16v6H10v-6Zm-3 9h22v19h4v3H3v-3h4V36Z" fill="currentColor"/><path d="M8 24h20M6 34h24" stroke="currentColor" stroke-width="3"/><path d="M15 27h6v6h-6zM11 39h4v5h-4zM21 39h4v5h-4zM15 48a3 3 0 0 1 6 0v8h-6z" fill="var(--paper,#faf6ed)"/></symbol>
+        <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+        <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.7a5.4 5.4 0 0 0-7.6 0L12 5.9l-1.2-1.2a5.4 5.4 0 0 0-7.6 7.6L12 21l8.8-8.7a5.4 5.4 0 0 0 0-7.6Z" fill="var(--heart-fill,none)" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+        <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+        <symbol id="i-pin" viewBox="0 0 24 24"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="10" r="2.2" fill="none" stroke="currentColor" stroke-width="1.7"/></symbol>
+        <symbol id="i-tram" viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m24 27 43-11 14 8-43 13-14-10v51l14 9 43-13V24M38 37v50m-14-9 43-13 14 9M27 28v-7l40-12 10 6-10 1M45 15l-7-9 17 3-7 5M47 85l-1 8m23-15 2 8M15 95l70-22M30 97l59-20M42 41l32-9v23l-32 9V41Zm-14-7 6 4v22l-6-4V34Zm19 5v22m11-25v22m11-25v22M42 71l32-9M46 74l24-7"/><circle cx="44" cy="81" r="2"/><circle cx="73" cy="72" r="2"/></g></symbol>
+      </defs>
+    </svg>
+    <a class="skip-link" href="#places">Duraklara geç</a>
+    <header class="site-header page-wrap">
+      <a class="brand" href="#top" aria-label="Şehir Arası ana sayfa"><svg class="brand-tower" aria-hidden="true"><use href="#i-tower"/></svg><span>şehirarası</span></a>
+      <nav class="main-nav" aria-label="Ana menü"><a href="#places">Keşfet</a><a href="#routeTemplates">Rotalar</a><a href="#journal">Günlüğüm</a><a href="#events">Takvim</a></nav>
+      <div class="header-actions"><label class="city-picker"><svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg><span class="sr-only">Şehir seç</span><select id="citySelect"><option value="istanbul">İstanbul</option><option value="ankara">Ankara</option><option value="izmir">İzmir</option></select></label><button class="account-button" id="accountButton" type="button">Giriş yap</button></div>
+    </header>
+
+    <main id="top">
+      <section class="hero page-wrap" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow"><span id="heroCityEyebrow">İSTANBUL'U YENİDEN GÖR</span> <span class="eyebrow-line"></span></p>
+          <h1 id="hero-title">Bir şehir.<br />Bin hikâye.<br /><em>Senin rotan.</em></h1>
+          <p class="hero-intro">Müzelerden ara sokaklara, merakının peşinden git.</p>
+          <a class="button button-dark" href="#places">Şehri keşfet <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+        </div>
+        <div class="hero-collage" aria-label="İstanbul'dan bir gezi defteri">
+          <figure class="collage-photo photo-galata"><img src="/static/photos/galata-sokak.jpg" alt="Tarihî binaların arasından Galata Kulesi'ne uzanan sokak" width="960" height="1280" fetchpriority="high" /><span class="photo-number" aria-hidden="true">1</span><figcaption class="handnote galata-note">Galata'dan<br />başlayalım.<svg class="note-arrow" viewBox="0 0 70 50" fill="none" aria-hidden="true"><path d="M8 8C5 29 24 42 58 35M47 29L58 35L49 44" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></figcaption></figure>
+          <figure class="collage-photo photo-ferry"><img src="/static/photos/bogaz-vapuru.jpg" alt="Boğaz'da ilerleyen İstanbul vapuru" width="960" height="711" /><span class="photo-number" aria-hidden="true">2</span><figcaption class="handnote ferry-note">Boğaz<br />her zaman<br />başka güzel.<svg class="note-arrow" viewBox="0 0 70 50" fill="none" aria-hidden="true"><path d="M8 8C5 29 24 42 58 35M47 29L58 35L49 44" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></figcaption></figure>
+          <figure class="collage-photo photo-museum"><img src="/static/photos/arkeoloji-salonu.jpg" alt="İstanbul Arkeoloji Müzeleri'nde sütunlarla çevrili tarihî bir salon" width="960" height="1201" /><span class="photo-number" aria-hidden="true">3</span><figcaption class="handnote museum-note">Geçmişle<br />bugün arasında<br />bir köprü.</figcaption></figure>
+          <svg class="collage-route" viewBox="0 0 1000 1000" preserveAspectRatio="none" fill="none" aria-hidden="true">
+            <defs><marker id="collage-arrow-tip" markerUnits="userSpaceOnUse" markerWidth="32" markerHeight="32" viewBox="0 0 32 32" refX="27" refY="16" orient="auto"><path d="M7 5L27 16L7 27" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></marker></defs>
+            <path d="M520 370C526 265 557 164 605 190" marker-end="url(#collage-arrow-tip)" stroke="currentColor" stroke-width="2" stroke-dasharray="7 7" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+            <path d="M1040 470C1120 510 1130 640 1050 700" marker-end="url(#collage-arrow-tip)" stroke="currentColor" stroke-width="2" stroke-dasharray="7 7" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+          </svg>
+          <span class="paper-note handnote">Aynı sokaklar,<br />hep yeni hikâyeler.</span>
+        </div>
+      </section>
+
+      <section class="explore-tools page-wrap" aria-label="Durak ara ve filtrele">
+        <form class="search-bar" id="searchForm" role="search">
+          <svg class="icon search-icon" aria-hidden="true"><use href="#i-search"/></svg>
+          <label class="sr-only" for="searchInput">Durak veya semt ara</label><input id="searchInput" type="search" placeholder="Bugün nereyi keşfedelim?" autocomplete="off" /><kbd>/</kbd>
+          <button class="button button-coral search-submit" type="submit">Ara <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+        </form>
+        <div class="category-chips" id="categoryChips" aria-label="Kategoriye göre filtrele"><button class="chip is-active" data-category="" type="button" aria-pressed="true">Hepsi</button></div>
+        <div class="tools-doodle" aria-hidden="true"><svg><use href="#i-tram"/></svg><span class="handnote">İyi şeyler<br />hep yolda.</span></div>
+      </section>
+
+      <section class="discovery" id="places" aria-labelledby="places-title">
+        <div class="page-wrap">
+          <div class="section-heading"><h2 id="places-title">Merakına bir durak.</h2><button class="text-link" id="showAllPlaces" type="button" aria-expanded="false" aria-controls="placeGrid">Tüm yerleri keşfet <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button></div>
+          <div class="discovery-toolbar"><p id="resultCount" aria-live="polite">Duraklar yükleniyor…</p><div class="select-filters">
+            <label class="select-wrap"><span class="sr-only">Semt seç</span><select id="districtSelect"><option value="">Tüm semtler</option></select></label>
+            <label class="select-wrap"><span class="sr-only">Sıralama seç</span><select id="sortSelect"><option value="popular">Öne çıkanlar</option><option value="rating">En yüksek puan</option><option value="az">A'dan Z'ye</option></select></label>
+            <button class="favorites-toggle" id="favoritesToggle" type="button" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg> Kaydettiklerim <b id="favoriteCount">0</b></button>
+          </div></div>
+          <div class="exploration-options"><fieldset class="trip-filters"><legend class="sr-only">Gezi tercihlerine göre filtrele</legend><label><input id="indoorFilter" type="checkbox" /> Kapalı mekân</label><label><input id="familyFilter" type="checkbox" /> Çocukla gezi</label><label><input id="accessibleFilter" type="checkbox" /> Doğrulanmış tekerlekli sandalye erişimi</label></fieldset><div class="view-switch" aria-label="Görünüm"><button id="listViewButton" type="button" aria-pressed="true">Kartlar</button><button id="mapViewButton" type="button" aria-pressed="false">Harita</button></div></div>
+          <p class="filter-explainer">Çocukla gezi önerileri editoryaldir. Erişim bilgisi bilinmeyen yerler erişilebilirlik filtresinde gösterilmez.</p>
+          <div id="mapView" class="map-layout" hidden><div><div id="discoveryMap" class="discovery-map" role="region" aria-label="Durakların haritası"></div><p id="mapStatus" class="small-note" aria-live="polite">Bir noktaya dokun, yeni bir durak keşfet.</p></div><aside id="mapPlaceCard" class="map-place-card"><p>Haritadaki bir durağı seç.</p></aside></div>
+          <div class="place-grid" id="placeGrid" aria-live="polite" aria-busy="true"></div>
+          <div class="empty-state" id="emptyState" hidden><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg><h3>Bu aramada bir şey bulamadık.</h3><p>Filtreleri değiştirip yeniden deneyebilirsin.</p><button class="text-button" id="clearFilters" type="button">Filtreleri temizle <span aria-hidden="true">↗</span></button></div>
+        </div>
+      </section>
+
+      <section class="feature-section page-wrap" id="routeTemplates" aria-labelledby="templatesTitle"><div class="section-heading"><div><p class="eyebrow">NEREDEN BAŞLASAM DİYENLERE</p><h2 id="templatesTitle">Hazır rotalar.</h2></div><a class="text-link" href="#routes">Benim rotalarım ↓</a></div><p class="section-intro">Bir rota seç, duraklarını keşfet; dilersen kendi planına dönüştür.</p><div id="templatesGrid" class="templates-grid" aria-live="polite"></div></section>
+
+      <section class="route-callout" id="route-callout" aria-labelledby="routeCalloutTitle"><div class="page-wrap route-callout-inner"><div><p class="eyebrow">MERAK ETTİĞİN YERLERİ BİR ARAYA GETİR</p><h2 id="routeCalloutTitle">Kendi yolunu çiz.</h2></div><svg class="callout-route" viewBox="0 0 380 100" fill="none" aria-hidden="true"><path d="M10 67c42-81 77 68 132-5S244 6 275 54s57 46 90-13" stroke="currentColor" stroke-width="1.7" stroke-dasharray="7 7"/><g stroke="currentColor" stroke-width="1.5"><path d="M22 20c0 11-9 19-9 19S4 31 4 20a9 9 0 0 1 18 0Z"/><circle cx="13" cy="20" r="3"/><circle cx="273" cy="54" r="5"/><path d="m354 42 12-3-1 12"/></g></svg><button class="button button-paper" id="newRouteButton" type="button">Rota oluştur <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button></div></section>
+
+      <section class="routes-section page-wrap" id="routes" aria-labelledby="routesTitle"><div class="section-heading"><div><p class="eyebrow">KENDİ GEZİ DEFTERİN</p><h2 id="routesTitle">Benim rotalarım.</h2></div><span class="handnote routes-note">Bir sonraki güzel gün için.</span></div><p class="routes-intro">Sevdiğin duraklar, küçük notların ve sana ait bir şehir.</p><div class="routes-grid" id="routesGrid" aria-live="polite"></div></section>
+
+      <section class="feature-section journal-section" id="journal" aria-labelledby="journalTitle"><div class="page-wrap"><div class="section-heading"><div><p class="eyebrow">GÜZEL GÜNLER BİRİKSİN</p><h2 id="journalTitle">Gezi günlüğüm.</h2></div><span id="journalCount" class="journal-count"></span></div><p class="section-intro">Ziyaret ettiğin bir durağın kartını aç; tarihini ve sadece sana ait notlarını kaydet.</p><div id="journalGrid" class="journal-grid" aria-live="polite"></div></div></section>
+
+      <section class="feature-section page-wrap" id="events" aria-labelledby="eventsTitle"><div class="section-heading"><div><p class="eyebrow">ŞEHRİN KÜLTÜR AJANDASI</p><h2 id="eventsTitle">Sergiler ve etkinlikler.</h2></div><button id="newEventButton" class="button button-dark" type="button" hidden>Etkinlik ekle +</button></div><div class="calendar-toolbar"><label for="eventMonth">Ay seç <input type="month" id="eventMonth" /></label><label><input type="checkbox" id="pastEvents" /> Geçmiş etkinlikleri de göster</label><button class="text-button" id="clearEventDay" type="button" hidden>Ayın tamamını göster</button></div><p class="small-note">Tarihler resmî kaynaklardan doğrulanmıştır. Program değişiklikleri için etkinliğin kaynak sayfasını kontrol et.</p><div class="calendar-layout"><div id="eventCalendar" class="event-calendar" aria-label="Etkinlik günleri"></div><div id="eventsGrid" class="events-grid" aria-live="polite"></div></div></section>
+
+      <section class="admin-section page-wrap" id="adminPanel" aria-labelledby="adminTitle" hidden><div class="section-heading routes-heading"><div><p class="eyebrow">İÇERİK YÖNETİMİ</p><h2 id="adminTitle">Durakları yönet.</h2></div><button class="button button-dark" id="newPlaceButton" type="button">Yeni durak ekle <span aria-hidden="true">↗</span></button></div><div class="admin-list" id="adminList"></div></section>
+
+      <section class="about-band" id="about"><div class="about-inner page-wrap"><svg class="about-tower" aria-hidden="true"><use href="#i-tower"/></svg><div><p class="eyebrow">ŞEHİR ARASI NE DEMEK?</p><h2>Biraz yavaşla.<br /><em>Biraz etrafına bak.</em></h2></div><p class="about-copy">Bir müzenin kapısından gir, hiç bilmediğin bir sokağa sap. Şehir Arası, İstanbul, Ankara ve İzmir'de yeni hikâyeler bulman için var. Keşfet, kaydet, kendi yolunu çiz.</p><a href="#places" class="about-link">Hadi, çıkalım <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a></div></section>
+    </main>
+
+    <footer class="site-footer page-wrap"><a class="brand footer-brand" href="#top"><svg class="brand-tower" aria-hidden="true"><use href="#i-tower"/></svg><span>şehirarası</span></a><p>Şehre merakla, <span aria-hidden="true">♡</span> ile.</p><div class="footer-meta"><a href="/static/photos/credits.html" target="_blank" rel="noopener">Fotoğraf kaynakları <span class="sr-only">(yeni sekmede açılır)</span></a><a href="/static/photos/city-credits.html" target="_blank" rel="noopener">Yeni şehir fotoğrafları</a><span>2026 · KENDİ ROTANI ÇİZ</span></div></footer>
+
+    <dialog class="detail-dialog" id="detailDialog" aria-labelledby="dialogTitle">
+      <button class="dialog-close" id="dialogClose" type="button" aria-label="Pencereyi kapat">×</button>
+      <div id="dialogContent" class="dialog-content"></div>
+    </dialog>
+
+    <dialog class="form-dialog" id="authDialog" aria-labelledby="authTitle">
+      <button class="form-dialog-close" data-close="authDialog" type="button" aria-label="Pencereyi kapat">×</button>
+      <p class="eyebrow">ŞEHİR ARASI HESABIN</p>
+      <h2 id="authTitle">Keşfin seninle <em>başlasın.</em></h2>
+      <div class="auth-tabs"><button class="is-active" data-auth-mode="login" type="button">Giriş yap</button><button data-auth-mode="register" type="button">Hesap oluştur</button></div>
+      <form id="authForm" class="stack-form">
+        <div class="form-field" id="authNameField" hidden><label for="authName">Adın</label><input id="authName" name="name" minlength="2" maxlength="50" autocomplete="name" /></div>
+        <div class="form-field"><label for="authEmail">E-posta</label><input id="authEmail" name="email" type="email" required autocomplete="email" /></div>
+        <div class="form-field"><label for="authPassword">Parola</label><input id="authPassword" name="password" type="password" minlength="8" required autocomplete="current-password" /></div>
+        <button class="button button-dark" id="authSubmit" type="submit">Giriş yap <span aria-hidden="true">↗</span></button>
+        <p class="form-message" id="authMessage" role="status"></p>
+      </form>
+    </dialog>
+
+    <dialog class="form-dialog" id="accountDialog" aria-labelledby="accountTitle">
+      <button class="form-dialog-close" data-close="accountDialog" type="button" aria-label="Pencereyi kapat">×</button>
+      <p class="eyebrow">HESABIN</p><h2 id="accountTitle">Merhaba, <em id="accountName">gezgin.</em></h2>
+      <p class="account-email" id="accountEmail"></p>
+      <button class="button button-dark" id="logoutButton" type="button">Çıkış yap <span aria-hidden="true">↗</span></button>
+    </dialog>
+
+    <dialog class="form-dialog wide-dialog" id="routeDialog" aria-labelledby="routeDialogTitle">
+      <button class="form-dialog-close" data-close="routeDialog" type="button" aria-label="Pencereyi kapat">×</button>
+      <p class="eyebrow">GEZİ PLANI</p><h2 id="routeDialogTitle">Yeni <em>rota.</em></h2>
+      <form id="routeForm" class="stack-form">
+        <input id="routeId" type="hidden" />
+        <div class="form-field"><label for="routeName">Rota adı</label><input id="routeName" minlength="3" maxlength="70" placeholder="Örn. Bir gün içinde tarihi yarımada" required /></div>
+        <div class="form-field"><label for="routeNotes">Notların</label><textarea id="routeNotes" maxlength="500" rows="3" placeholder="Bu rotayla ilgili hatırlamak istediklerin…"></textarea></div>
+        <fieldset class="place-picker"><legend>Duraklarını seç <small>(en fazla 12)</small></legend><p id="routePickerStatus" class="small-note" role="status"></p><div id="routePlaceOptions" class="place-options" aria-busy="false"></div></fieldset>
+        <div id="routeSelectedOrder" class="selected-order" aria-live="polite"></div><div id="routeEstimate" class="estimate-box" aria-live="polite"></div><button class="text-button" id="estimateWalkingButton" type="button" disabled>Yürüyüş yolunu hesapla</button>
+        <button class="button button-dark" type="submit">Rotayı kaydet <span aria-hidden="true">↗</span></button>
+        <p class="form-message" id="routeMessage" role="status"></p>
+      </form>
+    </dialog>
+
+    <dialog class="form-dialog wide-dialog" id="adminDialog" aria-labelledby="adminDialogTitle">
+      <button class="form-dialog-close" data-close="adminDialog" type="button" aria-label="Pencereyi kapat">×</button>
+      <p class="eyebrow">İÇERİK YÖNETİMİ</p><h2 id="adminDialogTitle">Yeni <em>durak.</em></h2>
+      <form id="adminForm" class="stack-form">
+        <input id="adminOriginalSlug" type="hidden" />
+        <div class="form-grid">
+          <div class="form-field"><label for="adminName">Durak adı</label><input id="adminName" required minlength="3" maxlength="100" /></div>
+          <div class="form-field"><label for="adminSlug">Kısa ad</label><input id="adminSlug" required minlength="3" maxlength="80" pattern="[a-z0-9]+(-[a-z0-9]+)*" placeholder="ornek-durak" /></div>
+          <div class="form-field"><label for="adminCategory">Kategori</label><select id="adminCategory" required></select></div>
+          <div class="form-field"><label for="adminDistrict">Semt</label><input id="adminDistrict" required maxlength="80" /></div>
+          <div class="form-field form-field-wide"><label for="adminAddress">Adres</label><input id="adminAddress" required maxlength="160" /></div>
+          <div class="form-field form-field-wide"><label for="adminSummary">Kısa tanıtım</label><textarea id="adminSummary" required minlength="10" maxlength="240" rows="2"></textarea></div>
+          <div class="form-field form-field-wide"><label for="adminDescription">Açıklama</label><textarea id="adminDescription" required minlength="20" maxlength="1800" rows="4"></textarea></div>
+          <div class="form-field"><label for="adminDuration">Önerilen süre</label><input id="adminDuration" required maxlength="40" placeholder="Örn. 1–2 saat" /></div>
+          <div class="form-field"><label for="adminBestFor">Kimler için?</label><input id="adminBestFor" required maxlength="80" placeholder="Örn. Sanat ve fotoğraf" /></div>
+          <div class="form-field"><label for="adminArt">Kart görünümü</label><select id="adminArt"><option value="gallery">Galeri</option><option value="dome">Kubbe</option><option value="palace">Saray</option><option value="cistern">Sarnıç</option><option value="columns">Sütunlar</option><option value="tower">Kule</option><option value="objects">Objeler</option><option value="machine">Makine</option><option value="garden">Bahçe</option><option value="coast">Sahil</option><option value="viewpoint">Manzara</option></select></div>
+          <div class="form-field"><label for="adminCity">Şehir</label><select id="adminCity" required></select></div>
+          <div class="form-field"><label for="adminVisitMinutes">Ziyaret süresi (dakika)</label><input id="adminVisitMinutes" type="number" min="5" max="720" value="90" required /></div>
+          <div class="form-field"><label for="adminLatitude">Enlem (isteğe bağlı)</label><input id="adminLatitude" type="number" step="any" min="-90" max="90" /></div>
+          <div class="form-field"><label for="adminLongitude">Boylam (isteğe bağlı)</label><input id="adminLongitude" type="number" step="any" min="-180" max="180" /></div>
+          <div class="form-field"><label for="adminIndoor">Kapalı mekân</label><select id="adminIndoor"><option value="">Bilinmiyor / karma</option><option value="true">Evet</option><option value="false">Hayır</option></select></div>
+          <div class="form-field"><label for="adminFamily">Çocukla gezi önerisi</label><select id="adminFamily"><option value="">Değerlendirilmedi</option><option value="true">Evet</option><option value="false">Hayır</option></select></div>
+          <div class="form-field"><label for="adminAccessible">Doğrulanmış sandalye erişimi</label><select id="adminAccessible"><option value="">Doğrulanmadı</option><option value="true">Evet</option><option value="false">Hayır</option></select></div>
+          <div class="form-field"><label for="adminSource">Resmî bilgi kaynağı</label><input id="adminSource" type="url" maxlength="700" /></div>
+          <div class="form-field form-field-wide"><label for="adminAccessNote">Erişim açıklaması</label><textarea id="adminAccessNote" maxlength="500" rows="2"></textarea></div>
+          <label class="featured-checkbox"><input id="adminFeatured" type="checkbox" /> Öne çıkan durak</label>
+        </div>
+        <button class="button button-dark" type="submit">Durağı kaydet <span aria-hidden="true">↗</span></button>
+        <p class="form-message" id="adminMessage" role="status"></p>
+      </form>
+    </dialog>
+    <dialog class="form-dialog wide-dialog" id="routeViewDialog" aria-labelledby="routeViewTitle"><button class="form-dialog-close" type="button" data-close="routeViewDialog" aria-label="Pencereyi kapat">×</button><p class="eyebrow" id="routeViewEyebrow">GEZİ PLANI</p><h2 id="routeViewTitle">Rota.</h2><p id="routeViewDescription" class="section-intro"></p><div id="routeViewStats" class="estimate-box" aria-live="polite"></div><ol id="routeViewStops" class="route-stop-list"></ol><div class="feature-actions"><button id="routeViewWalking" class="button button-dark" type="button">Yürüyüş yolunu hesapla</button><button id="routeViewCopy" class="text-button" type="button">Bu rotayı kendime ekle ↗</button></div><div id="routeViewMap" class="route-map" role="region" aria-label="Gezi rotası haritası"></div><p class="small-note">Harita: © OpenStreetMap katkıda bulunanlar · Rota: OSRM / FOSSGIS · <a href="https://www.openstreetmap.org/fixthemap" target="_blank" rel="noopener">Harita hatası bildir</a></p></dialog>
+
+    <dialog class="form-dialog wide-dialog" id="shareDialog" aria-labelledby="shareTitle"><button class="form-dialog-close" type="button" data-close="shareDialog" aria-label="Pencereyi kapat">×</button><p class="eyebrow">AYNI YOLDA BULUŞALIM</p><h2 id="shareTitle">Rotanı paylaş.</h2><p class="section-intro">Bağlantıyı bilenler rota adını ve durakları görebilir. Özel notların paylaşılmaz. Rotayı düzenlediğinde paylaşılan görünüm de güncellenir.</p><label class="form-field"><span>Paylaşım bağlantısı</span><input id="shareUrl" type="url" readonly /></label><p id="shareHint" class="small-note"></p><div class="feature-actions"><button class="button button-dark" id="copyShareButton" type="button">Bağlantıyı kopyala</button><button class="text-button" id="revokeShareButton" type="button">Paylaşımı kapat</button></div><p id="shareMessage" class="form-message" role="status"></p></dialog>
+
+    <dialog class="form-dialog" id="journalDialog" aria-labelledby="journalDialogTitle"><button class="form-dialog-close" type="button" data-close="journalDialog" aria-label="Pencereyi kapat">×</button><p class="eyebrow">SADECE SANA AİT</p><h2 id="journalDialogTitle">Gezi notun.</h2><p id="journalPlaceName" class="section-intro"></p><form id="journalForm" class="stack-form"><input id="journalSlug" type="hidden" /><div class="form-field"><label for="journalDate">Ziyaret tarihi</label><input id="journalDate" type="date" required /></div><div class="form-field"><label for="journalNotes">Özel notların</label><textarea id="journalNotes" maxlength="1500" rows="5" placeholder="Bugünden aklında ne kalsın?"></textarea></div><div class="feature-actions"><button class="button button-dark" type="submit">Günlüğüme kaydet</button><button class="text-button" id="removeJournalButton" type="button" hidden>Kaydı sil</button></div><p id="journalMessage" class="form-message" role="status"></p></form></dialog>
+
+    <dialog class="form-dialog wide-dialog" id="eventDialog" aria-labelledby="eventDialogTitle"><button class="form-dialog-close" type="button" data-close="eventDialog" aria-label="Pencereyi kapat">×</button><p class="eyebrow">KÜLTÜR AJANDASINI YÖNET</p><h2 id="eventDialogTitle">Etkinlik.</h2><form id="eventForm" class="stack-form"><input id="eventId" type="hidden" /><div class="form-grid"><div class="form-field"><label for="eventTitle">Etkinlik adı</label><input id="eventTitle" required minlength="3" maxlength="150" /></div><div class="form-field"><label for="eventSlug">Kısa ad</label><input id="eventSlug" required pattern="[a-z0-9]+(-[a-z0-9]+)*" maxlength="100" /></div><div class="form-field"><label for="eventCity">Şehir</label><select id="eventCity" required></select></div><div class="form-field"><label for="eventPlace">Durak</label><select id="eventPlace"><option value="">Bağımsız etkinlik</option></select></div><div class="form-field"><label for="eventStart">Başlangıç</label><input id="eventStart" type="date" required /></div><div class="form-field"><label for="eventEnd">Bitiş</label><input id="eventEnd" type="date" required /></div><div class="form-field form-field-wide"><label for="eventDescription">Açıklama</label><textarea id="eventDescription" required minlength="10" maxlength="1500" rows="3"></textarea></div><div class="form-field"><label for="eventSourceName">Kaynak kurum</label><input id="eventSourceName" required minlength="2" maxlength="100" /></div><div class="form-field"><label for="eventSourceUrl">Resmî kaynak bağlantısı</label><input id="eventSourceUrl" type="url" required maxlength="700" /></div><div class="form-field"><label for="eventVerified">Kaynağın kontrol tarihi</label><input id="eventVerified" type="date" required /></div></div><button class="button button-dark" type="submit">Etkinliği kaydet</button><p id="eventMessage" class="form-message" role="status"></p></form></dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

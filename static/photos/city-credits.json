@@ -1,0 +1,112 @@
+[
+  {
+    "slug": "anitkabir",
+    "title": "Anıtkabir",
+    "file": "Ataturk's Mausoleum (6225341313).jpg",
+    "local": "anitkabir.jpg",
+    "author": "William Neuheisel from DC, US",
+    "credit": "flickr",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Ataturk%27s_Mausoleum_(6225341313).jpg"
+  },
+  {
+    "slug": "anadolu-medeniyetleri-muzesi",
+    "title": "Anadolu Medeniyetleri Müzesi",
+    "file": "Museum of Anatolian Civilizations001.jpg",
+    "local": "anadolu-medeniyetleri-muzesi.jpg",
+    "author": "Georges Jansoone (JoJan)",
+    "credit": "self-made; own photo",
+    "license": "CC BY-SA 3.0",
+    "license_url": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "source": "https://commons.wikimedia.org/wiki/File:Museum_of_Anatolian_Civilizations001.jpg"
+  },
+  {
+    "slug": "ankara-kalesi",
+    "title": "Ankara Kalesi",
+    "file": "Ankara Castle.jpg",
+    "local": "ankara-kalesi.jpg",
+    "author": "Bernard Gagnon",
+    "credit": "Own work",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Ankara_Castle.jpg"
+  },
+  {
+    "slug": "izmir-saat-kulesi",
+    "title": "İzmir Saat Kulesi",
+    "file": "Izmir square clock tower.jpg",
+    "local": "izmir-saat-kulesi.jpg",
+    "author": "User:Sailko",
+    "credit": "File:Izmir,_torre_dell'orologio_03.JPG",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Izmir_square_clock_tower.jpg"
+  },
+  {
+    "slug": "ankara-etnografya-muzesi",
+    "title": "Ankara Etnografya Müzesi",
+    "file": "Ankara asv2021-10 img62 Ethnography Museum.jpg",
+    "local": "ankara-etnografya-muzesi.jpg",
+    "author": "A.Savin",
+    "credit": "Own work",
+    "license": "FAL",
+    "license_url": "http://artlibre.org/licence/lal/en",
+    "source": "https://commons.wikimedia.org/wiki/File:Ankara_asv2021-10_img62_Ethnography_Museum.jpg"
+  },
+  {
+    "slug": "ankara-vakif-eserleri-muzesi",
+    "title": "Ankara Vakıf Eserleri Müzesi",
+    "file": "Ankara Vakıf Museum building.jpg",
+    "local": "ankara-vakif-eserleri-muzesi.jpg",
+    "author": "Nedim Ardoğa",
+    "credit": "Own work",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Ankara_Vak%C4%B1f_Museum_building.jpg"
+  },
+  {
+    "slug": "izmir-ataturk-muzesi",
+    "title": "İzmir Atatürk Müzesi",
+    "file": "Atatürk muzeyi 202210 (3).jpg",
+    "local": "izmir-ataturk-muzesi.jpg",
+    "author": "Rəcəb Yaxşı",
+    "credit": "Own work",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Atat%C3%BCrk_muzeyi_202210_(3).jpg"
+  },
+  {
+    "slug": "tarihi-asansor",
+    "title": "Tarihî Asansör",
+    "file": "Asansor yandan.JPG",
+    "local": "tarihi-asansor.jpg",
+    "author": "Yabancı",
+    "credit": "Own work",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Asansor_yandan.JPG"
+  },
+  {
+    "slug": "kulturpark",
+    "title": "Kültürpark",
+    "file": "Kültürpark, May 2019 (1).jpg",
+    "local": "kulturpark.jpg",
+    "author": "BSRF",
+    "credit": "Own work",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:K%C3%BClt%C3%BCrpark,_May_2019_(1).jpg"
+  },
+  {
+    "slug": "smyrna-agorasi",
+    "title": "Smyrna Agorası",
+    "file": "TR Izmir asv2020-02 img62 Smyrna Agora.jpg",
+    "local": "smyrna-agorasi.jpg",
+    "author": "A.Savin",
+    "credit": "Own work",
+    "license": "FAL",
+    "license_url": "http://artlibre.org/licence/lal/en",
+    "source": "https://commons.wikimedia.org/wiki/File:TR_Izmir_asv2020-02_img62_Smyrna_Agora.jpg"
+  }
+]
