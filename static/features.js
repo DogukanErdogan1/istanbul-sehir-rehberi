@@ -200,21 +200,79 @@
   }
   async function loadJournal() {
     const request = ++journalRequest;
-    if (!app.state.user) { journal = []; renderJournal(); if (detailPlace && $('#detailDialog').open) detailsChanged(detailPlace); return; }
+    if (!app.state.user) {
+      journal = [];
+      app.state.journal = [];
+      app.state.journalError = "";
+      renderJournal();
+      app.renderProfile();
+      if (detailPlace && $('#detailDialog').open) detailsChanged(detailPlace);
+      return;
+    }
     try {
       const result = await app.fetchJson('/api/journal');
       if (request !== journalRequest) return;
-      journal = result.items; renderJournal();
+      journal = result.items;
+      app.state.journal = journal;
+      app.state.journalError = "";
+      renderJournal();
+      app.renderProfile();
       if (detailPlace && $('#detailDialog').open) detailsChanged(detailPlace);
-    } catch (error) { if (request === journalRequest) $('#journalGrid').innerHTML = errorBox(error.message); }
+    } catch (error) {
+      if (request === journalRequest) {
+        app.state.journal = [];
+        app.state.journalError = error.message;
+        $('#journalGrid').innerHTML = errorBox(error.message);
+        app.renderProfile();
+      }
+    }
   }
   function renderJournal() {
     if (!app) return;
-    const entries = journal.filter(item => item.city_slug === app.state.city);
-    $('#journalCount').textContent = app.state.user ? `${entries.length} ziyaret · Tüm şehirlerde ${journal.length}` : '';
-    if (!app.state.user) { $('#journalGrid').innerHTML = '<div class="feature-empty"><h3>Senin şehrin, senin hikâyen.</h3><p>Ziyaretlerini ve özel notlarını saklamak için giriş yap.</p><button class="text-button" data-feature-login type="button">Giriş yap ↗</button></div>'; return; }
-    $('#journalGrid').innerHTML = entries.length ? entries.map(entry => `<article class="journal-card"><time datetime="${h(entry.visited_on)}">${h(niceDate(entry.visited_on))}</time><h3><button class="text-button" data-journal-detail="${h(entry.slug)}" type="button">${h(entry.name)} ↗</button></h3><p class="journal-note">${h(entry.notes || 'Bugünden küçük bir hatıra.')}</p><button class="text-button" data-journal-place="${h(entry.slug)}" type="button">Notumu düzenle</button></article>`).join('') : errorBox('Bu şehirde henüz ziyaret kaydın yok. Bir durak açıp “Ziyaret ettim” düğmesine bas.');
+    const query = $('#journalSearch').value.trim().toLocaleLowerCase('tr-TR');
+    const city = $('#journalCity').value;
+    const entries = journal.filter(entry => (!city || entry.city_slug === city) &&
+      (!query || [entry.name, entry.city_name, entry.notes].join(' ').toLocaleLowerCase('tr-TR').includes(query)))
+      .sort((a, b) => $('#journalSort').value === 'oldest' ? a.visited_on.localeCompare(b.visited_on) : b.visited_on.localeCompare(a.visited_on));
+    $('#journalCount').textContent = app.state.user ? `${entries.length} anı · ${new Set(entries.map(entry => entry.city_slug)).size} şehir` : '';
+    if (!app.state.user) { $('#journalGrid').innerHTML = ''; return; }
+    if (app.state.journalError) { $('#journalGrid').innerHTML = errorBox(app.state.journalError); return; }
+    if (!entries.length) {
+      const filtered = Boolean(query || city);
+      $('#journalGrid').innerHTML = `<div class="personal-empty journal-page-empty"><div class="empty-notebook" aria-hidden="true"><span>şehirarası</span><b>İLK SAYFA</b><i>♡</i></div><p class="eyebrow">${filtered ? "BAŞKA BİR SAYFAYA BAKALIM" : "HER HİKÂYE BİR İLKLE BAŞLAR"}</p><h3>${filtered ? "Bu aramada bir anı bulamadık." : "İlk sayfa seni bekliyor."}</h3><p>${filtered ? "Aramanı veya şehir filtresini değiştirerek diğer ziyaretlerini görebilirsin." : "Gezdiğin bir yeri, o günün tarihini ve aklında kalan küçük bir detayı ekle. Güzel günler burada biriksin."}</p>${filtered ? '<button class="text-button" data-clear-journal-filters type="button">Filtreleri temizle ↗</button>' : '<button class="button button-dark" data-add-journal type="button">İlk anımı ekle +</button>'}</div>`;
+      return;
+    }
+    const groups = new Map();
+    entries.forEach(entry => { const month = entry.visited_on.slice(0, 7); if (!groups.has(month)) groups.set(month, []); groups.get(month).push(entry); });
+    $('#journalGrid').innerHTML = [...groups].map(([month, items]) => {
+      const monthName = new Date(month + '-01T12:00:00').toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' });
+      return `<section class="journal-month" aria-label="${h(monthName)}"><div class="journal-month-heading"><h3>${h(monthName)}</h3><span>${items.length} güzel hatıra</span></div><div class="journal-entries">${items.map(entry => {
+        const photo = window.GUIDE_PHOTOS?.[entry.slug] || '/static/photos/galata-sokak.jpg';
+        const day = new Date(entry.visited_on + 'T12:00:00').getDate();
+        const shortMonth = new Date(entry.visited_on + 'T12:00:00').toLocaleDateString('tr-TR', { month: 'short' });
+        return `<article class="journal-card"><div class="journal-entry-photo"><img src="${h(photo)}" alt="${h(entry.name)}" loading="lazy" /><span class="journal-date-ticket"><b>${day}</b><span>${h(shortMonth)}</span></span></div><div class="journal-entry-copy"><p class="journal-entry-city"><svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg>${h(entry.city_name)} · ${h(entry.district)}</p><h4><button class="text-button" data-journal-detail="${h(entry.slug)}" type="button">${h(entry.name)}</button></h4><p class="journal-note">${h(entry.notes || 'Bugünden küçük bir hatıra. Bu sayfaya aklında kalanları ekleyebilirsin.')}</p><div class="journal-entry-footer"><time datetime="${h(entry.visited_on)}">${h(niceDate(entry.visited_on))}</time><button class="text-button" data-journal-place="${h(entry.slug)}" type="button">Notumu düzenle ↗</button></div></div></article>`;
+      }).join('')}</div></section>`;
+    }).join('');
   }
+  function renderJournalPicker() {
+    const query = $('#journalPlaceSearch').value.trim().toLocaleLowerCase('tr-TR');
+    const places = app.state.catalog.filter(place => !query || [place.name, place.city_name, place.district].join(' ').toLocaleLowerCase('tr-TR').includes(query));
+    if (app.state.catalogStatus === 'loading') { $('#journalPlaceChoices').innerHTML = errorBox('Duraklar yükleniyor…'); return; }
+    $('#journalPlaceChoices').innerHTML = places.length ? places.map(place => {
+      const photo = window.GUIDE_PHOTOS?.[place.slug];
+      const existing = journal.some(entry => entry.slug === place.slug);
+      return `<button class="journal-place-choice" data-journal-place="${h(place.slug)}" type="button">${photo ? `<img src="${h(photo)}" alt="" loading="lazy" />` : ''}<span><strong>${h(place.name)}</strong><small>${h(place.city_name)} · ${h(place.district)}${existing ? ' · Günlüğünde var' : ''}</small></span><b aria-hidden="true">↗</b></button>`;
+    }).join('') : errorBox(app.state.catalogStatus === 'error' ? 'Durak listesi yüklenemedi. Pencereyi kapatıp yeniden deneyebilirsin.' : 'Bu aramada durak bulunamadı.');
+  }
+  async function openJournalPicker() {
+    if (!app.state.user) { app.openAuth('login'); return; }
+    $('#journalPlaceSearch').value = '';
+    $('#journalPickerDialog').showModal();
+    if (app.state.catalogStatus !== 'ready') { const loading = app.loadCatalog(); renderJournalPicker(); await loading; }
+    renderJournalPicker();
+    $('#journalPlaceSearch').focus();
+  }
+
   function openJournal(slug) {
     if (!app.state.user) { app.openAuth('login'); return; }
     const place = app.state.catalog.find(item => item.slug === slug) || detailPlace;
@@ -298,6 +356,12 @@
     $('#citySelect').value = app.state.city;
     $('#eventMonth').value = localDay().slice(0, 7);
     $('#citySelect').addEventListener('change', changeCity);
+    $('#journalSearch').addEventListener('input', renderJournal);
+    $('#journalCity').addEventListener('change', renderJournal);
+    $('#journalSort').addEventListener('change', renderJournal);
+    $('#journalAddButton').addEventListener('click', openJournalPicker);
+    $('#journalPlaceSearch').addEventListener('input', renderJournalPicker);
+
     for (const [id, field] of [['indoorFilter', 'indoor'], ['familyFilter', 'family'], ['accessibleFilter', 'accessible']]) $('#' + id).addEventListener('change', () => { app.state[field] = $('#' + id).checked; app.loadPlaces(); });
     $('#mapViewButton').addEventListener('click', () => { $('#mapView').hidden = false; $('#placeGrid').hidden = true; $('#mapViewButton').setAttribute('aria-pressed', 'true'); $('#listViewButton').setAttribute('aria-pressed', 'false'); renderMap(); });
     $('#listViewButton').addEventListener('click', () => { $('#mapView').hidden = true; $('#placeGrid').hidden = false; $('#mapViewButton').setAttribute('aria-pressed', 'false'); $('#listViewButton').setAttribute('aria-pressed', 'true'); app.renderPlaces(app.state.allPlaces); });
@@ -353,7 +417,9 @@
       if (target.hasAttribute('data-feature-login')) app.openAuth('login');
       if (target.dataset.mapPlace) app.showDetails(target.dataset.mapPlace);
       if (target.dataset.journalDetail) app.showDetails(target.dataset.journalDetail);
-      if (target.dataset.journalPlace) openJournal(target.dataset.journalPlace);
+      if (target.dataset.journalPlace) { $('#journalPickerDialog').close(); openJournal(target.dataset.journalPlace); }
+      if (target.hasAttribute('data-add-journal')) openJournalPicker();
+      if (target.hasAttribute('data-clear-journal-filters')) { $('#journalSearch').value = ''; $('#journalCity').value = ''; renderJournal(); }
       if (target.dataset.eventPlace) app.showDetails(target.dataset.eventPlace);
       if (target.dataset.viewStop) { $('#routeViewDialog').close(); app.showDetails(target.dataset.viewStop); }
       if (target.dataset.templateView) { const route = templates.find(item => item.slug === target.dataset.templateView); if (route) openRouteView(route); }
@@ -371,5 +437,5 @@
     const match = location.pathname.match(/^\/r\/([A-Za-z0-9_-]{20,64})\/?$/);
     if (match) app.fetchJson('/api/shared-routes/' + match[1]).then(route => openRouteView(route, true)).catch(error => { $('#routeViewTitle').textContent = 'Rota açılamadı.'; $('#routeViewDescription').textContent = error.message; $('#routeViewStats').innerHTML = ''; $('#routeViewStops').innerHTML = ''; $('#routeViewWalking').disabled = true; $('#routeViewCopy').hidden = true; $('#routeViewDialog').showModal(); });
   }
-  window.GuideFeatures = { init, statsMarkup, placesChanged, detailsChanged, sessionChanged, selectionChanged, populateAdmin, adminPayload, resetFilters };
+  window.GuideFeatures = { init, statsMarkup, placesChanged, detailsChanged, sessionChanged, selectionChanged, populateAdmin, adminPayload, resetFilters, openJournal };
 })();

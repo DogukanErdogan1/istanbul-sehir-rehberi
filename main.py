@@ -545,9 +545,13 @@ def _as_place(row: sqlite3.Row) -> dict:
     return place
 
 
+@app.get("/hesabim", include_in_schema=False)
+@app.get("/rotalarim", include_in_schema=False)
+@app.get("/gunlugum", include_in_schema=False)
 @app.get("/", include_in_schema=False)
-def home() -> FileResponse:
-    return FileResponse(STATIC_DIR / "index.html")
+def home(request: Request) -> FileResponse:
+    pages = {"/hesabim": "hesabim.html", "/rotalarim": "rotalarim.html", "/gunlugum": "gunlugum.html"}
+    return FileResponse(STATIC_DIR / pages.get(request.url.path, "index.html"))
 
 
 @app.get("/api/health")

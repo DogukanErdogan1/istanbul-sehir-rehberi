@@ -15,7 +15,7 @@
   const dialogContent = $("#dialogContent");
   const toast = $("#toast");
   const authDialog = $("#authDialog");
-  const accountDialog = $("#accountDialog");
+  const profileSection = $("#profile");
   const routeDialog = $("#routeDialog");
   const adminDialog = $("#adminDialog");
   const routesGrid = $("#routesGrid");
@@ -46,8 +46,9 @@
     "istanbul-modern": "İ",
   };
 
-  const state = { query: "", category: "", district: "", city: "istanbul", indoor: false, family: false, accessible: false, sort: "popular", favoritesOnly: false, showAll: false, allPlaces: [], catalog: [], catalogStatus: "idle", catalogError: "", catalogLegacy: false, categories: [], routes: [], user: null };
+  const state = { query: "", category: "", district: "", city: "istanbul", indoor: false, family: false, accessible: false, sort: "popular", favoritesOnly: false, showAll: false, allPlaces: [], catalog: [], catalogStatus: "idle", catalogError: "", catalogLegacy: false, categories: [], routes: [], journal: [], journalError: "", routesError: "", sessionReady: false, user: null };
   const photos = window.GUIDE_PHOTOS || {};
+  const cityDisplayNames = { istanbul: "İstanbul", ankara: "Ankara", izmir: "İzmir" };
   const suggestedSlugs = ["istanbul-modern", "yerebatan-sarnici", "emirgan-korusu"];
   let searchTimer;
   let toastTimer;
@@ -72,6 +73,7 @@
       try { localStorage.setItem("sehir-arasi:favorites", JSON.stringify([...favorites])); } catch { /* Storage may be disabled. */ }
     }
     favoriteCount.textContent = String(favorites.size);
+    renderProfile();
   }
 
   function escapeHtml(value) {
@@ -319,6 +321,7 @@
         });
         state.catalogStatus = "ready";
         renderAdminList();
+        renderProfile();
       } catch (error) {
         state.catalogStatus = "error";
         state.catalogError = error.message;
@@ -336,32 +339,52 @@
     favorites = new Set(result.slugs);
     saveFavorites();
     renderPlaces(state.allPlaces);
+    renderProfile();
+  }
+
+  async function mergeGuestFavorites() {
+    if (!state.user) return;
+    const guestFavorites = [...readFavorites()];
+    if (!guestFavorites.length) return;
+    const transfers = await Promise.allSettled(guestFavorites.map((slug) =>
+      fetchJson("/api/favorites/" + encodeURIComponent(slug), { method: "POST" })
+    ));
+    const pendingFavorites = guestFavorites.filter((_, index) => transfers[index].status === "rejected");
+    try { localStorage.setItem("sehir-arasi:favorites", JSON.stringify(pendingFavorites)); } catch { /* Storage may be disabled. */ }
   }
 
   async function loadSession() {
     try {
       const result = await fetchJson("/api/auth/me");
       state.user = result.user;
-      if (state.user) await loadSavedFavorites();
-      else favorites = readFavorites();
+      if (state.user) {
+        await mergeGuestFavorites();
+        await loadSavedFavorites();
+      } else favorites = readFavorites();
     } catch {
       state.user = null;
       favorites = readFavorites();
     }
+    state.sessionReady = true;
     saveFavorites();
     renderAccountUi();
     await loadRoutes();
   }
 
   function renderAccountUi() {
-    $("#accountButton").textContent = state.user ? state.user.name.split(" ")[0] : "Giriş yap";
+    const signedIn = Boolean(state.user);
+    window.GuidePages?.setSession(state.user, state.sessionReady);
+    $("#accountButton").textContent = signedIn ? "Hesabım" : "Giriş yap";
+    $("#accountButton").setAttribute("aria-label", signedIn ? "Hesabım: " + state.user.name : "Giriş yap");
+    profileSection.hidden = !signedIn;
     $("#adminPanel").hidden = state.user?.role !== "admin";
     if (state.user) {
-      $("#accountName").textContent = `${state.user.name.split(" ")[0]}.`;
+      $("#accountName").textContent = state.user.name;
       $("#accountEmail").textContent = state.user.email;
     }
     renderRoutes();
     renderAdminList();
+    renderProfile();
     window.GuideFeatures?.sessionChanged();
   }
 
@@ -382,37 +405,126 @@
   }
 
   function renderRoutes() {
+    const count = $("#routesCount");
     if (!state.user) {
       routesGrid.innerHTML = '<div class="route-guest"><strong>Rotan henüz başlamadı.</strong><span>Durakları bir araya getirmek için hesabına giriş yap.</span><button data-open-auth type="button">Giriş yap ↗</button></div>';
+      count.textContent = "";
       return;
     }
-    if (!state.routes.length) {
-      routesGrid.innerHTML = '<div class="route-empty"><strong>Henüz rotan yok.</strong><span>İlk gezi planını oluşturmak için yukarıdaki düğmeye bas.</span></div>';
+    if (state.routesError) {
+      routesGrid.innerHTML = '<div class="personal-empty"><h3>Rotalarını açamadık.</h3><p>' + escapeHtml(state.routesError) + '</p><button class="button button-dark" data-retry-routes type="button">Yeniden dene</button></div>';
       return;
     }
-    routesGrid.innerHTML = state.routes.map((route, index) => `
-      <article class="route-card">
-        <div class="route-card-top"><span>ROTA ${String(index + 1).padStart(2, "0")}</span><span>${route.places.length} DURAK</span></div>
-        <h3>${escapeHtml(route.title)}</h3>
-        <p>${escapeHtml(route.notes || "Kendi şehir keşif planın.")}</p>
+    const query = $("#personalRouteSearch").value.trim().toLocaleLowerCase("tr-TR");
+    const city = $("#personalRouteCity").value;
+    const routes = state.routes.filter(route => {
+      const haystack = [route.title, route.notes, ...route.places.map(place => place.name)].join(" ").toLocaleLowerCase("tr-TR");
+      return (!query || haystack.includes(query)) && (!city || route.places.some(place => place.city_slug === city));
+    });
+    count.textContent = routes.length + " rota" + (routes.length !== state.routes.length ? " · Toplam " + state.routes.length : " · Yola çıkmaya hazır");
+    if (!routes.length) {
+      const filtered = Boolean(query || city);
+      routesGrid.innerHTML = `<div class="personal-empty route-page-empty"><svg class="empty-route-doodle" viewBox="0 0 230 100" fill="none" aria-hidden="true"><path d="M10 75C25 5 70 110 100 45S160 15 180 55S210 80 220 30" stroke="currentColor" stroke-width="2" stroke-dasharray="6 7"/><circle cx="10" cy="75" r="6" fill="#dc2d1d"/><path d="m207 35 13-5-1 14" stroke="currentColor" stroke-width="2"/></svg><p class="eyebrow">${filtered ? "BİRAZ BAŞKA BİR YERDEN BAK" : "İLK ADIMI SEN AT"}</p><h3>${filtered ? "Bu aramada bir rota bulamadık." : "Henüz çizilmemiş güzel yollar var."}</h3><p>${filtered ? "Aramanı veya şehir filtresini değiştirerek yeniden deneyebilirsin." : "Bir kahve molası, bir müze kapısı, bir sahil yürüyüşü. İlk rotanı birlikte bir araya getirelim."}</p>${filtered ? '<button class="text-button" data-clear-route-filters type="button">Filtreleri temizle ↗</button>' : '<button class="button button-coral" data-new-route type="button">İlk rotamı çiz ↗</button>'}</div>`;
+      return;
+    }
+    routesGrid.innerHTML = routes.map((route, index) => {
+      const places = route.places;
+      const cities = [...new Set(places.map(place => place.city_name || cityDisplayNames[place.city_slug]).filter(Boolean))].join(" · ");
+      const photo = photos[places[0]?.slug] || "/static/photos/galata-sokak.jpg";
+      return `<article class="route-card">
+        <button class="route-card-photo" data-route-view="${route.id}" type="button" aria-label="${escapeHtml(route.title)} rotasını görüntüle"><img src="${escapeHtml(photo)}" alt="${escapeHtml(places[0]?.name || "Şehir keşfi")}" loading="lazy" /><span class="route-card-number">${String(index + 1).padStart(2, "0")}</span><span class="route-city-badge">${escapeHtml(cities || "Şehir rotası")}</span></button>
+        <div class="route-card-body"><div class="route-card-top"><span>SANA AİT BİR PLAN</span><span>${places.length} DURAK</span></div>
+        <h3><button data-route-view="${route.id}" type="button">${escapeHtml(route.title)}</button></h3>
+        <p class="route-card-note">${escapeHtml(route.notes || "Bu yolculuğa kendi hikâyeni ekle.")}</p>
         ${window.GuideFeatures?.statsMarkup(route.metrics) || ""}
-        <div class="route-places">${route.places.map((place, placeIndex) => `<span>${placeIndex + 1}. ${escapeHtml(place.name)}</span>`).join("")}</div>
-        <div class="route-card-actions"><button data-route-view="${route.id}" type="button">Görüntüle ↗</button><button data-route-edit="${route.id}" type="button">Düzenle</button><button data-route-share="${route.id}" type="button">${route.share_enabled ? "Paylaşımı yönet" : "Paylaş"}</button><button data-route-delete="${route.id}" type="button">Sil</button></div>
-      </article>`).join("");
+        <ol class="route-places">${places.map((place, placeIndex) => `<li><b>${placeIndex + 1}</b><span>${escapeHtml(place.name)}</span></li>`).join("")}</ol>
+        <div class="route-card-actions"><button data-route-view="${route.id}" type="button">Rotayı aç ↗</button><button data-route-edit="${route.id}" type="button">Düzenle</button><button data-route-share="${route.id}" type="button">${route.share_enabled ? "Paylaşımı yönet" : "Paylaş"}</button><button class="route-delete" data-route-delete="${route.id}" type="button">Sil</button></div></div>
+      </article>`;
+    }).join("");
   }
 
   async function loadRoutes() {
     if (!state.user) {
       state.routes = [];
       renderRoutes();
+      renderProfile();
       return;
     }
     try {
+      state.routesError = "";
       const result = await fetchJson("/api/routes");
       state.routes = result.items;
       renderRoutes();
+      renderProfile();
     } catch (error) {
+      state.routesError = error.message;
+      renderRoutes();
       showToast(error.message);
+    }
+  }
+
+  function profileDate(value) {
+    const date = new Date(value + "T12:00:00");
+    return Number.isNaN(date.valueOf()) ? "" : date.toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" });
+  }
+
+  function renderProfile() {
+    $("#profileFavoriteCount").textContent = String(favorites.size);
+    $("#profileRouteCount").textContent = String(state.routes.length);
+    $("#profileVisitCount").textContent = String(state.journal.length);
+    window.GuidePages?.refresh(state, favorites.size);
+    profileSection.hidden = !state.user;
+    if (!state.user) return;
+
+    const favoriteGrid = $("#profileFavoritesGrid");
+    const query = $("#profileFavoriteSearch").value.trim().toLocaleLowerCase("tr-TR");
+    const favoritePlaces = [...favorites].map((slug) => state.catalog.find((place) => place.slug === slug)).filter(Boolean)
+      .filter(place => !query || [place.name, place.city_name, place.district].join(" ").toLocaleLowerCase("tr-TR").includes(query));
+    $("#favoritesListCount").textContent = favoritePlaces.length + " durak · Tüm şehirlerde";
+    if (favorites.size && state.catalogStatus === "loading") {
+      favoriteGrid.innerHTML = '<div class="profile-empty">Favori durakların yükleniyor…</div>';
+    } else if (favoritePlaces.length) {
+      favoriteGrid.innerHTML = favoritePlaces.map((place) =>
+        '<article class="profile-place-card">' +
+          '<div class="profile-place-art">' + placeImage(place) + '</div>' +
+          '<div class="profile-place-copy"><p>' + escapeHtml(place.city_name || "Şehir") + ' · ' + escapeHtml(place.district || "") + '</p>' +
+            '<h4><button class="profile-item-title" data-profile-open-place="' + escapeHtml(place.slug) + '" type="button">' + escapeHtml(place.name) + '</button></h4>' +
+            '<button class="text-button" data-profile-remove-favorite="' + escapeHtml(place.slug) + '" type="button">Favorilerimden çıkar</button>' +
+          '</div></article>'
+      ).join("");
+    } else {
+      const message = favorites.size && state.catalogStatus === "error"
+        ? "Favoriler yüklenemedi. Sayfayı yenileyip yeniden deneyebilirsin."
+        : query ? "Bu aramada bir favori bulamadık. Farklı bir durak veya şehir adı deneyebilirsin."
+        : "Henüz bir kalp bırakmadın. Merak ettiğin duraklardaki kalp simgesine dokun; bir gün gideceğin yerler burada biriksin.";
+      favoriteGrid.innerHTML = '<div class="profile-empty"><p>' + escapeHtml(message) + '</p><a class="text-link" href="/#places">Durakları keşfet ↗</a></div>';
+    }
+
+    const routeGrid = $("#profileRoutesGrid");
+    routeGrid.innerHTML = state.routes.length ? state.routes.slice(0, 2).map((route) => {
+      const places = route.places || [];
+      const cities = [...new Set(places.map((place) => place.city_name || cityDisplayNames[place.city_slug]).filter(Boolean))].join(" · ");
+      return '<article class="profile-route-item"><div><p class="profile-item-meta">' +
+        places.length + ' DURAK' + (cities ? ' · ' + escapeHtml(cities) : '') + '</p><h4>' +
+        escapeHtml(route.title) + '</h4><p class="profile-item-note">' +
+        escapeHtml(route.notes || "Kendi şehir keşif planın.") + '</p></div>' +
+        '<button class="text-button" data-profile-edit-route="' + Number(route.id) + '" type="button">Rotayı düzenle</button></article>';
+    }).join("") : '<div class="profile-empty"><p>Henüz kayıtlı rotan yok. Hazır rotalardan birini ekleyebilir veya yeni bir rota oluşturabilirsin.</p><a class="text-link" href="/#routeTemplates">Hazır rotalara bak ↗</a></div>';
+
+    const journalGrid = $("#profileJournalGrid");
+    if (state.journalError) {
+      journalGrid.innerHTML = '<div class="profile-empty" role="alert">' + escapeHtml(state.journalError) + '</div>';
+    } else if (state.journal.length) {
+      journalGrid.innerHTML = state.journal.slice(0, 2).map((entry) =>
+        '<article class="profile-journal-item"><div class="profile-item-meta"><time datetime="' + escapeHtml(entry.visited_on) + '">' +
+        escapeHtml(profileDate(entry.visited_on)) + '</time><span>' + escapeHtml(entry.city_name || "Şehir") +
+        '</span></div><h4><button class="profile-item-title" data-profile-open-place="' + escapeHtml(entry.slug) +
+        '" type="button">' + escapeHtml(entry.name) + '</button></h4><p class="profile-item-note">' +
+        escapeHtml(entry.notes || "Bugünden küçük bir hatıra.") + '</p><button class="text-button" data-profile-edit-journal="' +
+        escapeHtml(entry.slug) + '" type="button">Gezi notunu düzenle</button></article>'
+      ).join("");
+    } else {
+      journalGrid.innerHTML = '<div class="profile-empty"><p>Günlüğünde henüz ziyaret kaydı yok. Bir durağın ayrıntılarından “Ziyaret ettim” seçeneğini kullanabilirsin.</p><a class="text-link" href="/#places">Bir durak keşfet ↗</a></div>';
     }
   }
 
@@ -452,6 +564,7 @@
     if (!state.user) return openAuth("login");
     state.routeCity = route?.places?.[0]?.city_slug || state.city;
     $("#routeForm").reset();
+    $("#routeCitySelect").value = state.routeCity;
     $("#routeMessage").textContent = "";
     $("#routeId").value = route?.id || "";
     $("#routeName").value = route?.title || "";
@@ -550,8 +663,26 @@
   });
 
   $("#accountButton").addEventListener("click", () => {
-    if (state.user) accountDialog.showModal();
-    else openAuth("login");
+    if (!state.user) return openAuth("login");
+    if (window.GuidePages?.page === "account") window.scrollTo({ top: 0, behavior: "smooth" });
+    else window.GuidePages.navigate("account");
+  });
+
+  $("#personalNewRouteButton").addEventListener("click", () => openRouteDialog());
+  $("#personalRouteSearch").addEventListener("input", renderRoutes);
+  $("#personalRouteCity").addEventListener("change", renderRoutes);
+  $("#profileFavoriteSearch").addEventListener("input", renderProfile);
+  profileSection.addEventListener("click", async (event) => {
+    const target = event.target.closest("button");
+    if (!target) return;
+    if (target.dataset.profileRemoveFavorite) return toggleFavorite(target.dataset.profileRemoveFavorite);
+    if (target.dataset.profileOpenPlace) return showDetails(target.dataset.profileOpenPlace);
+    if (target.dataset.profileEditRoute) {
+      const route = state.routes.find((item) => item.id === Number(target.dataset.profileEditRoute));
+      if (route) openRouteDialog(route);
+      return;
+    }
+    if (target.dataset.profileEditJournal) window.GuideFeatures?.openJournal(target.dataset.profileEditJournal);
   });
 
   authDialog.querySelector(".auth-tabs").addEventListener("click", (event) => {
@@ -573,15 +704,14 @@
         method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
       });
       state.user = result.user;
-      if (authMode === "register") {
-        const guestFavorites = [...readFavorites()];
-        await Promise.allSettled(guestFavorites.map((slug) => fetchJson(`/api/favorites/${encodeURIComponent(slug)}`, { method: "POST" })));
-      }
+      state.sessionReady = true;
+      await mergeGuestFavorites();
       await loadSavedFavorites();
       renderAccountUi();
       await loadRoutes();
       authDialog.close();
       form.reset();
+      window.GuidePages?.afterLogin();
       showToast(`Hoş geldin, ${state.user.name.split(" ")[0]}!`);
     } catch (error) {
       message.textContent = error.message;
@@ -599,13 +729,18 @@
       renderPlaces(state.allPlaces);
       renderAccountUi();
       await loadRoutes();
-      accountDialog.close();
+      window.scrollTo({ top: 0, behavior: "smooth" });
       showToast("Çıkış yapıldı.");
     } catch (error) { showToast(error.message); }
   });
 
   $("#newRouteButton").addEventListener("click", () => openRouteDialog());
   routesGrid.addEventListener("click", async (event) => {
+    if (event.target.closest("[data-new-route]")) return openRouteDialog();
+    if (event.target.closest("[data-retry-routes]")) return loadRoutes();
+    if (event.target.closest("[data-clear-route-filters]")) {
+      $("#personalRouteSearch").value = ""; $("#personalRouteCity").value = ""; renderRoutes(); return;
+    }
     if (event.target.closest("[data-open-auth]")) return openAuth("login");
     const edit = event.target.closest("[data-route-edit]");
     if (edit) return openRouteDialog(state.routes.find((route) => route.id === Number(edit.dataset.routeEdit)));
@@ -616,6 +751,12 @@
       await loadRoutes();
       showToast("Rota silindi.");
     } catch (error) { showToast(error.message); }
+  });
+
+  $("#routeCitySelect").addEventListener("change", () => {
+    state.routeCity = $("#routeCitySelect").value;
+    if (selectedRouteSlugs.length) { selectedRouteSlugs = []; showToast("Yeni şehir için duraklarını seçebilirsin."); }
+    renderRoutePicker();
   });
 
   $("#routePlaceOptions").addEventListener("click", (event) => {
@@ -672,6 +813,7 @@
       routeDialog.close();
       await loadRoutes();
       showToast(routeId ? "Rota güncellendi." : "Rota oluşturuldu.");
+      if (window.GuidePages?.page === "home") window.GuidePages.navigate("routes");
     } catch (error) { message.textContent = error.message; }
     finally { delete form.dataset.saving; submit.disabled = false; }
   });
@@ -791,7 +933,7 @@
     }
   });
 
-  window.GuideFeatures?.init({ state, escapeHtml, fetchJson, showToast, showDetails, openAuth, openRouteDialog, loadPlaces, loadFilters, loadCatalog, loadRoutes, renderPlaces });
+  window.GuideFeatures?.init({ state, escapeHtml, fetchJson, showToast, showDetails, openAuth, openRouteDialog, loadPlaces, loadFilters, loadCatalog, loadRoutes, renderPlaces, renderProfile });
   saveFavorites();
   renderAccountUi();
   Promise.allSettled([loadFilters(), loadCatalog()]).then(async () => {

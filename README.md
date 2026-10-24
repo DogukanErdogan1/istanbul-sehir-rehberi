@@ -141,3 +141,9 @@ istanbul-sehir-rehberi/
     ├── vendor/leaflet/
     └── fonts/
 ```
+
+## Kişisel sayfalar
+
+Hesabım, Rotalarım ve Günlüğüm ayrı HTML sayfalarıdır. Menü bağlantıları sırasıyla `/static/hesabim.html`, `/static/rotalarim.html` ve `/static/gunlugum.html` adreslerini açar. Sunucu yeniden başlatıldığında `/hesabim`, `/rotalarim` ve `/gunlugum` kısa adresleri de aynı sayfaları açar.
+
+Sayfa tasarımları `static/personal-pages.css`, gezinme `static/personal-pages.js` içindedir. Ortak sayfa iskeleti `static/index.html` değiştiğinde kişisel sayfaları `python build_pages.py` komutuyla yeniden üret. Hesap, rota ve günlük bilgileri mevcut kullanıcı API'lerinden yüklenir.
