@@ -376,6 +376,7 @@
     window.GuidePages?.setSession(state.user, state.sessionReady);
     $("#accountButton").textContent = signedIn ? "Hesabım" : "Giriş yap";
     $("#accountButton").setAttribute("aria-label", signedIn ? "Hesabım: " + state.user.name : "Giriş yap");
+    $("#demoLoginButton").hidden = signedIn;
     profileSection.hidden = !signedIn;
     $("#adminPanel").hidden = state.user?.role !== "admin";
     if (state.user) {
@@ -666,6 +667,25 @@
     if (!state.user) return openAuth("login");
     if (window.GuidePages?.page === "account") window.scrollTo({ top: 0, behavior: "smooth" });
     else window.GuidePages.navigate("account");
+  });
+
+  $("#demoLoginButton").addEventListener("click", async (event) => {
+    const button = event.currentTarget;
+    button.disabled = true;
+    try {
+      const result = await fetchJson("/api/auth/demo-login", { method: "POST" });
+      state.user = result.user;
+      state.sessionReady = true;
+      await loadSavedFavorites();
+      renderAccountUi();
+      await loadRoutes();
+      window.GuidePages?.afterLogin();
+      showToast("Hoş geldin, " + state.user.name.split(" ")[0] + "!");
+    } catch (error) {
+      showToast(error.message);
+    } finally {
+      button.disabled = false;
+    }
   });
 
   $("#personalNewRouteButton").addEventListener("click", () => openRouteDialog());
