@@ -400,6 +400,20 @@ def hash_password(password: str) -> str:
     return f"pbkdf2_sha256${rounds}${salt.hex()}${digest.hex()}"
 
 
+def ensure_demo_account() -> None:
+    with db_session() as db:
+        row = db.execute("SELECT id FROM users WHERE email = ?", ("demo@sehirarasi.demo",)).fetchone()
+        if row:
+            return
+        db.execute(
+            "INSERT INTO users (name, email, password_hash, role, created_at) VALUES (?, ?, ?, 'member', ?)",
+            ("Demo Gezgin", "demo@sehirarasi.demo", hash_password(secrets.token_urlsafe(32)), utc_now()),
+        )
+
+
+ensure_demo_account()
+
+
 def verify_password(password: str, stored: str) -> bool:
     try:
         algorithm, rounds, salt_hex, digest_hex = stored.split("$")
@@ -595,6 +609,19 @@ def login(payload: LoginCreate, request: Request) -> JSONResponse:
         ).fetchone()
     if row is None or not verify_password(payload.password, row["password_hash"]):
         raise HTTPException(status_code=401, detail="E-posta veya parola hatalı.")
+    return create_session_response(public_user(row), request)
+
+
+@app.post("/api/auth/demo-login")
+def demo_login(request: Request) -> JSONResponse:
+    check_origin(request)
+    with db_session() as db:
+        row = db.execute(
+            "SELECT id, name, email, role FROM users WHERE email = ?",
+            ("demo@sehirarasi.demo",),
+        ).fetchone()
+    if row is None or row["role"] != "member":
+        raise HTTPException(status_code=503, detail="Demo hesabı şu anda kullanılamıyor.")
     return create_session_response(public_user(row), request)
 
 
