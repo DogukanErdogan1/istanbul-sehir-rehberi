@@ -47,6 +47,7 @@ img { display: block; max-width: 100%; }
 .header-city .icon { width: 16px; height: 18px; }
 .account-button { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-height: 39px; padding: 8px 21px; border: 1px solid var(--coral); border-radius: 8px; background: transparent; color: var(--coral-dark); font-size: 13px; font-weight: 700; }
 .account-button:hover { background: var(--coral); color: #fff; }
+html:not([data-auth="member"]):not([data-auth="guest"]) #accountButton { visibility: hidden; pointer-events: none; }
 .demo-account-button { background: var(--coral); color: #fff; }
 .demo-account-button:hover { background: var(--coral-dark); color: #fff; }
 .demo-button-compact { display: none; }

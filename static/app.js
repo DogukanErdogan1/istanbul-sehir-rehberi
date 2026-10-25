@@ -357,17 +357,21 @@
     try {
       const result = await fetchJson("/api/auth/me");
       state.user = result.user;
-      if (state.user) {
-        await mergeGuestFavorites();
-        await loadSavedFavorites();
-      } else favorites = readFavorites();
     } catch {
       state.user = null;
-      favorites = readFavorites();
     }
     state.sessionReady = true;
-    saveFavorites();
+    if (!state.user) favorites = readFavorites();
     renderAccountUi();
+    if (state.user) {
+      try {
+        await mergeGuestFavorites();
+        await loadSavedFavorites();
+      } catch (error) {
+        showToast(error.message);
+      }
+    }
+    saveFavorites();
     await loadRoutes();
   }
 
@@ -376,7 +380,9 @@
     window.GuidePages?.setSession(state.user, state.sessionReady);
     $("#accountButton").textContent = signedIn ? "Hesabım" : "Giriş yap";
     $("#accountButton").setAttribute("aria-label", signedIn ? "Hesabım: " + state.user.name : "Giriş yap");
-    $("#demoLoginButton").hidden = signedIn;
+    $("#accountButton").disabled = !state.sessionReady;
+    $("#accountButton").setAttribute("aria-busy", String(!state.sessionReady));
+    $("#demoLoginButton").hidden = !state.sessionReady || signedIn;
     profileSection.hidden = !signedIn;
     $("#adminPanel").hidden = state.user?.role !== "admin";
     if (state.user) {
@@ -956,8 +962,7 @@
   window.GuideFeatures?.init({ state, escapeHtml, fetchJson, showToast, showDetails, openAuth, openRouteDialog, loadPlaces, loadFilters, loadCatalog, loadRoutes, renderPlaces, renderProfile });
   saveFavorites();
   renderAccountUi();
-  Promise.allSettled([loadFilters(), loadCatalog()]).then(async () => {
-    await loadSession();
+  Promise.allSettled([loadSession(), loadFilters(), loadCatalog()]).then(async () => {
     await loadPlaces();
   });
 })();
