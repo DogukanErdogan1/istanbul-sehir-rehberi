@@ -47,6 +47,9 @@ img { display: block; max-width: 100%; }
 .header-city .icon { width: 16px; height: 18px; }
 .account-button { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-height: 39px; padding: 8px 21px; border: 1px solid var(--coral); border-radius: 8px; background: transparent; color: var(--coral-dark); font-size: 13px; font-weight: 700; }
 .account-button:hover { background: var(--coral); color: #fff; }
+.demo-account-button { background: var(--coral); color: #fff; }
+.demo-account-button:hover { background: var(--coral-dark); color: #fff; }
+.demo-button-compact { display: none; }
 
 /* A page from an Istanbul travel notebook */
 .hero { display: grid; grid-template-columns: .94fr 1.06fr; align-items: center; gap: 22px; padding-top: 15px; padding-bottom: 12px; }
@@ -367,8 +370,9 @@ img { display: block; max-width: 100%; }
   .brand-tower { width: 23px; height: 38px; }
   .main-nav { margin-left: auto; gap: 13px; font-size: 10px; }
   .main-nav a:first-child { display: none; }
-  .header-actions { gap: 0; margin-left: 0; }
+  .header-actions { gap: 6px; margin-left: 0; }
   .account-button { max-width: 85px; min-height: 34px; padding: 7px 10px; font-size: 10px; border-radius: 6px; }
+  .demo-account-button { max-width: 94px; padding-inline: 8px; }
   .hero { grid-template-columns: 1fr; gap: 35px; padding-top: 25px; padding-bottom: 10px; }
   .hero-copy { padding: 0; }
   .hero .eyebrow { margin-bottom: 19px; font-size: 9px; gap: 17px; }
@@ -454,6 +458,13 @@ img { display: block; max-width: 100%; }
   .review-heading h3 { font-size: 18px; }
   .review-heading > span { padding-top: 4px; font-size: 9px; }
   .review-item-top { flex-wrap: wrap; }
+}
+@media (max-width: 450px) {
+  .site-header { height: auto; min-height: 72px; flex-wrap: wrap; column-gap: 8px; row-gap: 2px; padding-block: 8px; }
+  .main-nav { order: 3; width: 100%; justify-content: center; margin: 0; }
+  .demo-button-label { display: none; }
+  .demo-button-compact { display: inline; }
+  .demo-account-button { max-width: 60px; }
 }
 @media (max-width: 360px) {
   .page-wrap { width: calc(100% - 28px); }
