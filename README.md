@@ -162,3 +162,16 @@ Sunucu başlangıcında `route_budget_items` tablosu mevcut kayıtlar korunarak 
 Bütçe API'si: `GET/POST /api/routes/{route_id}/budget`, `PUT/DELETE /api/routes/{route_id}/budget/{item_id}`. Harcama tutarları isteklerde `planned_amount` ve `spent_amount`, cevaplarda `planned_kurus` ve `spent_kurus` alanlarıyla taşınır.
 
 Kontroller: `python -m unittest discover -s tests -v`. Bütçeye ait testler `tests/test_budget.py` dosyasındadır.
+
+
+## Bana bir gün planla
+
+Ana sayfadaki **Bana bir gün planla** düğmesi veya Rotalarım sayfasındaki aynı bağlantıyla planlayıcıyı aç. Şehir, başlangıç saati, ayırabileceğin süre, ilgi alanları, tempo ve mola payını seç. Kapalı mekân, çocukla gezi ve doğrulanmış durak erişimi filtreleri isteğe bağlıdır. İlgi alanlarına ve yakınlığa göre en fazla altı duraklı (sakin tempoda en fazla dört) bir öneri, saat saat ziyaret/geçiş/mola çizelgesi ve kalan serbest zaman gösterilir.
+
+Plan oluşturmak için giriş gerekmez. Kaydetmek için giriş yaptığında önerin korunur; ardından **Rotalarıma kaydet** ile mevcut rota sistemine eklersin. Kaydedilmiş bir plan Rotalarım'dan düzenlenebilir ve bütçesine harcama kalemleri eklenebilir. Aynı önerinin kaydet düğmesi tekrar tıklanarak yanlışlıkla birden çok kez gönderilmesi önlenir. Tercihler değiştiğinde önce yeni plan oluşturulmalıdır.
+
+`POST /api/day-plans` yalnızca yerel katalogla çalışır; API anahtarı ve dış servis gerekmez. Gün planı üretmek veritabanına yazmaz. Kaydetme mevcut oturum ve `POST /api/routes` kurallarını kullanır. Yeni sürüme geçerken sunucuyu yeniden başlat ve kişisel sayfaları `python build_pages.py` ile üret.
+
+Ziyaret süreleri editoryal tahmindir. Geçişler kuş uçuşu mesafeye dayalı yaklaşık sürelerdir; gerçek yürüyüş güzergâhı ve erişilebilirliği doğrulanmış değildir. İlk durağa ulaşım ve dönüş dahil değildir. Açılış/kapanış saatleri, kapalı günler ve güncel ücretler kontrol edilmez; sonuçlarda durakların resmî kaynak bağlantıları bulunur. Uygun durak veya yeterli süre bulunmazsa filtreler sessizce gevşetilmez; kullanıcı tercihlerini değiştirmeye yönlendirilir.
+
+API kontrolleri `tests/test_day_planner.py` dosyasındadır. Giriş sonrası önerinin korunması, kaydetme ve form akışı için bağımlılık gerektirmeyen kontrol: `node tests/test_day_planner_ui.cjs`. Bu kontrol gerçek tarayıcıda görsel doğrulama yerine geçmez.

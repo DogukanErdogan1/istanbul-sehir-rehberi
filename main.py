@@ -21,6 +21,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from guide_features import upgrade_database, install_features, route_metrics
 from guide_budget import upgrade_budget_database, install_budget
+from guide_day_planner import install_day_planner
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -994,3 +995,4 @@ def admin_delete_place(slug: str, request: Request) -> Response:
 
 install_features(app, sys.modules[__name__])
 install_budget(app, sys.modules[__name__])
+install_day_planner(app, sys.modules[__name__])

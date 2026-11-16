@@ -440,5 +440,5 @@
     const match = location.pathname.match(/^\/r\/([A-Za-z0-9_-]{20,64})\/?$/);
     if (match) app.fetchJson('/api/shared-routes/' + match[1]).then(route => openRouteView(route, true)).catch(error => { $('#routeViewTitle').textContent = 'Rota açılamadı.'; $('#routeViewDescription').textContent = error.message; $('#routeViewStats').innerHTML = ''; $('#routeViewStops').innerHTML = ''; $('#routeViewWalking').disabled = true; $('#routeViewCopy').hidden = true; $('#routeViewDialog').showModal(); });
   }
-  window.GuideFeatures = { init, statsMarkup, placesChanged, detailsChanged, sessionChanged, selectionChanged, populateAdmin, adminPayload, resetFilters, openJournal };
+  window.GuideFeatures = { init, previewRoute: openRouteView, statsMarkup, placesChanged, detailsChanged, sessionChanged, selectionChanged, populateAdmin, adminPayload, resetFilters, openJournal };
 })();

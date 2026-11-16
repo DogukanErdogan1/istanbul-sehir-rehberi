@@ -393,6 +393,7 @@
     renderAdminList();
     renderProfile();
     window.GuideFeatures?.sessionChanged();
+    window.GuidePlanner?.sessionChanged();
   }
 
   function setAuthMode(mode) {
@@ -685,7 +686,7 @@
       await loadSavedFavorites();
       renderAccountUi();
       await loadRoutes();
-      window.GuidePages?.afterLogin();
+      if (!window.GuidePlanner?.afterLogin()) window.GuidePages?.afterLogin();
       showToast("Hoş geldin, " + state.user.name.split(" ")[0] + "!");
     } catch (error) {
       showToast(error.message);
@@ -737,7 +738,7 @@
       await loadRoutes();
       authDialog.close();
       form.reset();
-      window.GuidePages?.afterLogin();
+      if (!window.GuidePlanner?.afterLogin()) window.GuidePages?.afterLogin();
       showToast(`Hoş geldin, ${state.user.name.split(" ")[0]}!`);
     } catch (error) {
       message.textContent = error.message;
@@ -961,6 +962,7 @@
 
   window.GuideFeatures?.init({ state, escapeHtml, fetchJson, showToast, showDetails, openAuth, openRouteDialog, loadPlaces, loadFilters, loadCatalog, loadRoutes, renderPlaces, renderProfile });
   window.GuideBudget?.init({ state, fetchJson, escapeHtml, showToast, openAuth });
+  window.GuidePlanner?.init({ state, fetchJson, escapeHtml, showToast, openAuth, showDetails, loadRoutes });
   saveFavorites();
   renderAccountUi();
   Promise.allSettled([loadSession(), loadFilters(), loadCatalog()]).then(async () => {

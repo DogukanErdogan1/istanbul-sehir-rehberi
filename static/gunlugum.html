@@ -15,11 +15,13 @@
     <link rel="stylesheet" href="/static/personal-pages.css?v=personal-4" />
     <link rel="stylesheet" href="/static/budget.css?v=budget-1" />
     <script src="/static/budget.js?v=budget-1" defer></script>
+    <link rel="stylesheet" href="/static/day-planner.css?v=day-plan-1" />
+    <script src="/static/day-planner.js?v=day-plan-1" defer></script>
     <script src="/static/photos.js?v=kultur-3-1" defer></script>
     <script src="/static/city-photos.js?v=guide-2-1" defer></script>
     <script src="/static/vendor/leaflet/leaflet.js" defer></script>
-    <script src="/static/features.js?v=budget-1" defer></script>
-    <script src="/static/app.js?v=budget-1" defer></script>
+    <script src="/static/features.js?v=day-plan-1" defer></script>
+    <script src="/static/app.js?v=day-plan-1" defer></script>
   </head>
   <body>
     <svg class="svg-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -46,7 +48,7 @@
         <div><p class="eyebrow">HİKÂYEN BURADA BAŞLASIN</p><h1 id="personalGuestTitle">Defterin<br /><em>seni bekliyor.</em></h1><p>Favori durakların, gezi planların ve yalnızca sana ait notların. Kendi şehir defterini açmak için hesabına giriş yap.</p><button class="button button-dark" data-feature-login type="button">Defterimi aç <span aria-hidden="true">↗</span></button><a class="guest-explore" href="/#places">Önce şehre göz at</a></div>
       </section>
       <section class="personal-hero routes-page-hero page-wrap personal-auth-content" id="routesPageHero" aria-labelledby="routesPageTitle">
-        <div class="personal-hero-copy"><p class="eyebrow"><span class="chapter-number">02</span> KENDİ YOLUNU ÇİZ</p><h1 id="routesPageTitle">Bir sonraki<br /><em>güzel gün.</em></h1><p class="personal-lead">Sevdiğin durakları bir araya getir.<br />Şehrin ritmini, kendi adımlarınla bul.</p><button class="button button-coral" id="personalNewRouteButton" type="button">Yeni bir rota çiz <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button><div class="hero-mini-stats"><span><strong id="routeSummaryCount">0</strong> kaydedilmiş rota</span><span><strong id="routeSummaryStops">0</strong> farklı durak</span></div></div>
+        <div class="personal-hero-copy"><p class="eyebrow"><span class="chapter-number">02</span> KENDİ YOLUNU ÇİZ</p><h1 id="routesPageTitle">Bir sonraki<br /><em>güzel gün.</em></h1><p class="personal-lead">Sevdiğin durakları bir araya getir.<br />Şehrin ritmini, kendi adımlarınla bul.</p><button class="button button-coral" id="personalNewRouteButton" type="button">Yeni bir rota çiz <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button><button class="text-button day-plan-routes-launch" type="button" data-open-day-planner>Bana bir gün planla ↗</button><div class="hero-mini-stats"><span><strong id="routeSummaryCount">0</strong> kaydedilmiş rota</span><span><strong id="routeSummaryStops">0</strong> farklı durak</span></div></div>
         <div class="route-sketch" aria-hidden="true"><span class="sketch-caption">PLANLAR KÜÇÜK, HİKÂYELER BÜYÜK.</span><svg class="sketch-line" viewBox="0 0 520 330" fill="none"><path d="M45 260C10 90 190 290 205 140S420 25 460 150S350 345 250 270" stroke="currentColor" stroke-width="2" stroke-dasharray="7 7"/><g fill="#dc2d1d" stroke="#faf6ed" stroke-width="5"><circle cx="45" cy="260" r="19"/><circle cx="205" cy="140" r="19"/><circle cx="250" cy="270" r="19"/></g><g fill="#fff" font-family="Manrope, sans-serif" font-size="13" text-anchor="middle"><text x="45" y="265">1</text><text x="205" y="145">2</text><text x="250" y="275">3</text></g></svg><figure class="sketch-photo"><img src="/static/photos/bogaz-vapuru.jpg" alt="" /><figcaption class="handnote">Yolun sonu,<br />yeni bir başlangıç.</figcaption></figure><span class="handnote sketch-handnote">Bir sokak daha<br />yürüyelim mi?</span><span class="route-stamp">ŞEHİR ARASI<br /><b>YOLA ÇIK</b><br />♡</span></div>
       </section>
       <section class="personal-hero journal-page-hero page-wrap personal-auth-content" id="journalPageHero" aria-labelledby="journalPageTitle">
@@ -58,7 +60,7 @@
           <p class="eyebrow"><span id="heroCityEyebrow">İSTANBUL'U YENİDEN GÖR</span> <span class="eyebrow-line"></span></p>
           <h1 id="hero-title">Bir şehir.<br />Bin hikâye.<br /><em>Senin rotan.</em></h1>
           <p class="hero-intro">Müzelerden ara sokaklara, merakının peşinden git.</p>
-          <a class="button button-dark" href="/#places">Şehri keşfet <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          <div class="hero-actions"><a class="button button-dark" href="/#places">Şehri keşfet <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a><button class="button button-paper day-plan-launch" type="button" data-open-day-planner>Bana bir gün planla ↗</button></div>
         </div>
         <div class="hero-collage" aria-label="İstanbul'dan bir gezi defteri">
           <figure class="collage-photo photo-galata"><img src="/static/photos/galata-sokak.jpg" alt="Tarihî binaların arasından Galata Kulesi'ne uzanan sokak" width="960" height="1280" fetchpriority="high" /><span class="photo-number" aria-hidden="true">1</span><figcaption class="handnote galata-note">Galata'dan<br />başlayalım.<svg class="note-arrow" viewBox="0 0 70 50" fill="none" aria-hidden="true"><path d="M8 8C5 29 24 42 58 35M47 29L58 35L49 44" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></figcaption></figure>
@@ -255,6 +257,27 @@
           <section class="budget-category-paper" aria-labelledby="budgetCategoryTitle"><p class="eyebrow">NERELERE AYIRDIK?</p><h3 id="budgetCategoryTitle">Kalem kalem.</h3><table class="budget-category-table"><caption class="sr-only">Kategoriye göre planlanan ve harcanan tutarlar</caption><thead><tr><th scope="col">Kategori</th><th scope="col">Planlanan</th><th scope="col">Harcanan</th></tr></thead><tbody id="budgetCategories"></tbody></table><p class="budget-category-note">Tutarları sen belirlersin.<br />Küçük bir kahve molası da plana dahil.</p><span class="handnote">Yolun tadını çıkar.</span></section>
         </div>
         <section class="budget-items-section" aria-labelledby="budgetItemsTitle"><div class="budget-items-heading"><h3 id="budgetItemsTitle">Gezi hesabın.</h3><span id="budgetItemCount"></span></div><div id="budgetItems"></div></section>
+      </div>
+    </dialog>
+
+
+    <dialog class="form-dialog day-planner-dialog" id="dayPlannerDialog" aria-labelledby="dayPlannerTitle">
+      <button class="form-dialog-close" data-close="dayPlannerDialog" type="button" aria-label="Gün planlayıcıyı kapat">×</button>
+      <div class="day-planner-heading"><div><p class="eyebrow">ŞEHİR BUGÜN SANA KALSIN</p><h2 id="dayPlannerTitle">Bir gün.<em> Senin ritmin.</em></h2></div><span class="handnote">Nereden başlasam?</span></div>
+      <p class="day-planner-intro">Şehrini, vaktini ve merak ettiklerini seç. Birbirine yakın duraklarla sana uygun bir günün taslağını çıkaralım.</p>
+      <div class="day-planner-layout">
+        <form id="dayPlannerForm" class="day-planner-controls stack-form">
+          <div class="form-field"><label for="plannerCity">Hangi şehir?</label><select id="plannerCity"><option value="istanbul">İstanbul</option><option value="ankara">Ankara</option><option value="izmir">İzmir</option></select></div>
+          <div class="day-planner-pair"><div class="form-field"><label for="plannerStart">Başlangıç saati</label><input id="plannerStart" type="time" value="09:00" required /></div><div class="form-field"><label for="plannerDuration">Ne kadar vaktin var?</label><select id="plannerDuration"><option value="120">2 saat</option><option value="180">3 saat</option><option value="240" selected>4 saat</option><option value="360">6 saat</option><option value="480">8 saat</option><option value="600">10 saat</option></select></div></div>
+          <fieldset class="day-planner-interests"><legend>Neye meraklısın?</legend><p id="plannerInterestHint">En az bir ilgi alanı seç.</p><div><label><input name="plannerInterest" type="checkbox" value="museum" checked /><span>Müzeler</span></label><label><input name="plannerInterest" type="checkbox" value="history" checked /><span>Tarihî yerler</span></label><label><input name="plannerInterest" type="checkbox" value="view" checked /><span>Manzara</span></label><label><input name="plannerInterest" type="checkbox" value="nature" /><span>Doğa</span></label><label><input name="plannerInterest" type="checkbox" value="culture" /><span>Kültür</span></label></div></fieldset>
+          <div class="day-planner-pair"><div class="form-field"><label for="plannerPace">Gezi tempon</label><select id="plannerPace"><option value="balanced">Dengeli</option><option value="relaxed">Sakin sakin</option></select></div><div class="form-field"><label for="plannerBreak">Mola payı</label><select id="plannerBreak"><option value="0">Molasız</option><option value="15">15 dakika</option><option value="30" selected>30 dakika</option><option value="45">45 dakika</option><option value="60">1 saat</option></select></div></div>
+          <details class="day-planner-extra"><summary>Ek tercihler</summary><label><input id="plannerIndoor" type="checkbox" /> Yalnızca kapalı mekânlar</label><label><input id="plannerFamily" type="checkbox" /> Çocukla geziye uygun öneriler</label><label><input id="plannerAccessible" type="checkbox" /> Erişimi doğrulanmış duraklar</label><p>Çocukla gezi önerileri editoryaldir. Erişim bilgisi bilinmeyen yerler son filtrede gösterilmez.</p></details>
+          <button id="plannerGenerate" class="button button-coral" type="submit">Günümü planla ↗</button>
+        </form>
+        <div class="day-planner-output"><p id="plannerStatus" class="day-planner-status" role="status" aria-live="polite"></p>
+          <div id="plannerPlaceholder" class="day-planner-placeholder"><svg viewBox="0 0 210 120" fill="none" aria-hidden="true"><path d="M18 92C30 12 63 109 104 53S162 12 191 49" stroke="currentColor" stroke-width="2" stroke-dasharray="6 7"/><circle cx="18" cy="92" r="7" fill="#dc2d1d"/><path d="m179 47 12 2-3-13" stroke="currentColor" stroke-width="2"/></svg><h3>Güzel bir gün,<br />küçük bir planla başlar.</h3><p>Tercihlerini seçtiğinde saat saat önerilerin burada görünecek.</p></div>
+          <div id="plannerResult" hidden><div class="day-planner-result-heading"><p class="eyebrow">SANA GÖRE BİR BAŞLANGIÇ</p><h3 id="plannerResultTitle"></h3><p id="plannerResultWindow"></p></div><div id="plannerSummary" class="day-planner-summary"></div><p id="plannerTimingNote" class="day-planner-timing"></p><ol id="plannerTimeline" class="day-planner-timeline"></ol><div class="day-planner-notes"><strong>Yola çıkmadan önce</strong><ul id="plannerNotes"></ul></div><div class="day-planner-save"><div class="form-field"><label for="plannerRouteTitle">Rotanın adı</label><input id="plannerRouteTitle" minlength="3" maxlength="70" /></div><div class="day-planner-actions"><button id="plannerSave" class="button button-dark" type="button">Rotalarıma kaydet +</button><button id="plannerMap" class="text-button" type="button">Haritada incele ↗</button><a id="plannerSavedLink" class="text-link" href="/static/rotalarim.html" hidden>Rotalarıma git ↗</a></div></div></div>
+        </div>
       </div>
     </dialog>
 
