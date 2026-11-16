@@ -158,6 +158,9 @@
     $('#routeViewStats').innerHTML = fullStats(route.metrics);
     $('#routeViewStops').innerHTML = route.places.map((place, index) => `<li><span>${index + 1}</span><div><button type="button" class="text-button" data-view-stop="${h(place.slug)}">${h(place.name)} ↗</button><small>${h(place.district)} · ${h(duration(place.visit_minutes || 90))} ziyaret</small></div></li>`).join('');
     $('#routeViewCopy').hidden = Boolean(route.id);
+    const ownRoute = !shared && app.state.routes.some(item => item.id === route.id);
+    $('#routeViewBudget').hidden = !ownRoute;
+    $('#routeViewBudget').dataset.routeBudget = ownRoute ? String(route.id) : '';
     $('#routeViewWalking').disabled = route.places.length < 2;
     $('#routeViewDialog').showModal();
     drawRouteMap(route);

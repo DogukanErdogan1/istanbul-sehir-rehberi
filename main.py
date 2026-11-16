@@ -20,6 +20,7 @@ from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from guide_features import upgrade_database, install_features, route_metrics
+from guide_budget import upgrade_budget_database, install_budget
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -384,6 +385,7 @@ def initialize_database() -> None:
             )
 
         upgrade_database(db)
+        upgrade_budget_database(db)
 
 
 initialize_database()
@@ -991,3 +993,4 @@ def admin_delete_place(slug: str, request: Request) -> Response:
 
 
 install_features(app, sys.modules[__name__])
+install_budget(app, sys.modules[__name__])

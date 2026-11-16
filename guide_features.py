@@ -195,8 +195,8 @@ def install_features(app, core):
         return [lookup[slug] for slug in slugs]
 
     @app.get("/r/{token}", include_in_schema=False)
-    def shared_page(token: str):
-        return core.home()
+    def shared_page(token: str, request: Request):
+        return core.home(request)
 
     @app.get("/api/cities")
     def cities():

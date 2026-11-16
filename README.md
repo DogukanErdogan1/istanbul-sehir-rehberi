@@ -147,3 +147,18 @@ istanbul-sehir-rehberi/
 Hesabım, Rotalarım ve Günlüğüm ayrı HTML sayfalarıdır. Menü bağlantıları sırasıyla `/static/hesabim.html`, `/static/rotalarim.html` ve `/static/gunlugum.html` adreslerini açar. Sunucu yeniden başlatıldığında `/hesabim`, `/rotalarim` ve `/gunlugum` kısa adresleri de aynı sayfaları açar.
 
 Sayfa tasarımları `static/personal-pages.css`, gezinme `static/personal-pages.js` içindedir. Ortak sayfa iskeleti `static/index.html` değiştiğinde kişisel sayfaları `python build_pages.py` komutuyla yeniden üret. Hesap, rota ve günlük bilgileri mevcut kullanıcı API'lerinden yüklenir.
+
+
+## Gezi bütçesi
+
+Rotalarım sayfasında bir rotanın **Bütçe** düğmesine ya da rotayı açtıktan sonra **Bütçeyi aç** bağlantısına tıkla. Ulaşım, yeme içme, giriş ve bilet, konaklama ve diğer kategorilerinde planlanan tutarları ve gerçekleşen harcamaları ekleyebilir, düzenleyebilir ve silebilirsin. Harcama tarihi ve kısa not isteğe bağlıdır.
+
+Tüm tutarlar Türk lirasıdır. Virgül veya noktayla en fazla iki ondalık basamak girilebilir; örneğin `1250,50`. Planlanan, harcanan, kalan veya aşılan tutar ve kategori toplamları otomatik hesaplanır. Kalem başına üst sınır 9.999.999,99 TL, rota başına sınır 200 kalemdir. Her iki tutarı sıfır olan bir kalem kaydedilmez.
+
+Bütçe verileri rota sahibine aittir; paylaşılan rota bağlantıları bütçe kalemlerini veya notlarını göstermez. Rotayı silmek o rotanın bütçe kalemlerini de siler. Demo hesabını kullanan ziyaretçiler aynı hesabın verilerini paylaşır.
+
+Sunucu başlangıcında `route_budget_items` tablosu mevcut kayıtlar korunarak oluşturulur. Tutarlar yuvarlama hatalarını önlemek için tam sayı kuruş olarak saklanır. Yeni sürüme geçerken sunucuyu yeniden başlat.
+
+Bütçe API'si: `GET/POST /api/routes/{route_id}/budget`, `PUT/DELETE /api/routes/{route_id}/budget/{item_id}`. Harcama tutarları isteklerde `planned_amount` ve `spent_amount`, cevaplarda `planned_kurus` ve `spent_kurus` alanlarıyla taşınır.
+
+Kontroller: `python -m unittest discover -s tests -v`. Bütçeye ait testler `tests/test_budget.py` dosyasındadır.

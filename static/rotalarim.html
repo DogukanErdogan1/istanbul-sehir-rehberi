@@ -13,11 +13,13 @@
     <link rel="stylesheet" href="/static/app.css?v=auth-nav-1" />
     <link rel="stylesheet" href="/static/features.css?v=guide-2-2" />
     <link rel="stylesheet" href="/static/personal-pages.css?v=personal-4" />
+    <link rel="stylesheet" href="/static/budget.css?v=budget-1" />
+    <script src="/static/budget.js?v=budget-1" defer></script>
     <script src="/static/photos.js?v=kultur-3-1" defer></script>
     <script src="/static/city-photos.js?v=guide-2-1" defer></script>
     <script src="/static/vendor/leaflet/leaflet.js" defer></script>
-    <script src="/static/features.js?v=personal-4" defer></script>
-    <script src="/static/app.js?v=auth-nav-1" defer></script>
+    <script src="/static/features.js?v=budget-1" defer></script>
+    <script src="/static/app.js?v=budget-1" defer></script>
   </head>
   <body>
     <svg class="svg-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -219,7 +221,7 @@
         <p class="form-message" id="adminMessage" role="status"></p>
       </form>
     </dialog>
-    <dialog class="form-dialog wide-dialog" id="routeViewDialog" aria-labelledby="routeViewTitle"><button class="form-dialog-close" type="button" data-close="routeViewDialog" aria-label="Pencereyi kapat">×</button><p class="eyebrow" id="routeViewEyebrow">GEZİ PLANI</p><h2 id="routeViewTitle">Rota.</h2><p id="routeViewDescription" class="section-intro"></p><div id="routeViewStats" class="estimate-box" aria-live="polite"></div><ol id="routeViewStops" class="route-stop-list"></ol><div class="feature-actions"><button id="routeViewWalking" class="button button-dark" type="button">Yürüyüş yolunu hesapla</button><button id="routeViewCopy" class="text-button" type="button">Bu rotayı kendime ekle ↗</button></div><div id="routeViewMap" class="route-map" role="region" aria-label="Gezi rotası haritası"></div><p class="small-note">Harita: © OpenStreetMap katkıda bulunanlar · Rota: OSRM / FOSSGIS · <a href="https://www.openstreetmap.org/fixthemap" target="_blank" rel="noopener">Harita hatası bildir</a></p></dialog>
+    <dialog class="form-dialog wide-dialog" id="routeViewDialog" aria-labelledby="routeViewTitle"><button class="form-dialog-close" type="button" data-close="routeViewDialog" aria-label="Pencereyi kapat">×</button><p class="eyebrow" id="routeViewEyebrow">GEZİ PLANI</p><h2 id="routeViewTitle">Rota.</h2><p id="routeViewDescription" class="section-intro"></p><div id="routeViewStats" class="estimate-box" aria-live="polite"></div><ol id="routeViewStops" class="route-stop-list"></ol><div class="feature-actions"><button id="routeViewWalking" class="button button-dark" type="button">Yürüyüş yolunu hesapla</button><button id="routeViewBudget" class="text-button" type="button" hidden>Bütçeyi aç ↗</button><button id="routeViewCopy" class="text-button" type="button">Bu rotayı kendime ekle ↗</button></div><div id="routeViewMap" class="route-map" role="region" aria-label="Gezi rotası haritası"></div><p class="small-note">Harita: © OpenStreetMap katkıda bulunanlar · Rota: OSRM / FOSSGIS · <a href="https://www.openstreetmap.org/fixthemap" target="_blank" rel="noopener">Harita hatası bildir</a></p></dialog>
 
     <dialog class="form-dialog wide-dialog" id="shareDialog" aria-labelledby="shareTitle"><button class="form-dialog-close" type="button" data-close="shareDialog" aria-label="Pencereyi kapat">×</button><p class="eyebrow">AYNI YOLDA BULUŞALIM</p><h2 id="shareTitle">Rotanı paylaş.</h2><p class="section-intro">Bağlantıyı bilenler rota adını ve durakları görebilir. Özel notların paylaşılmaz. Rotayı düzenlediğinde paylaşılan görünüm de güncellenir.</p><label class="form-field"><span>Paylaşım bağlantısı</span><input id="shareUrl" type="url" readonly /></label><p id="shareHint" class="small-note"></p><div class="feature-actions"><button class="button button-dark" id="copyShareButton" type="button">Bağlantıyı kopyala</button><button class="text-button" id="revokeShareButton" type="button">Paylaşımı kapat</button></div><p id="shareMessage" class="form-message" role="status"></p></dialog>
 
@@ -228,6 +230,33 @@
     <dialog class="form-dialog wide-dialog" id="eventDialog" aria-labelledby="eventDialogTitle"><button class="form-dialog-close" type="button" data-close="eventDialog" aria-label="Pencereyi kapat">×</button><p class="eyebrow">KÜLTÜR AJANDASINI YÖNET</p><h2 id="eventDialogTitle">Etkinlik.</h2><form id="eventForm" class="stack-form"><input id="eventId" type="hidden" /><div class="form-grid"><div class="form-field"><label for="eventTitle">Etkinlik adı</label><input id="eventTitle" required minlength="3" maxlength="150" /></div><div class="form-field"><label for="eventSlug">Kısa ad</label><input id="eventSlug" required pattern="[a-z0-9]+(-[a-z0-9]+)*" maxlength="100" /></div><div class="form-field"><label for="eventCity">Şehir</label><select id="eventCity" required></select></div><div class="form-field"><label for="eventPlace">Durak</label><select id="eventPlace"><option value="">Bağımsız etkinlik</option></select></div><div class="form-field"><label for="eventStart">Başlangıç</label><input id="eventStart" type="date" required /></div><div class="form-field"><label for="eventEnd">Bitiş</label><input id="eventEnd" type="date" required /></div><div class="form-field form-field-wide"><label for="eventDescription">Açıklama</label><textarea id="eventDescription" required minlength="10" maxlength="1500" rows="3"></textarea></div><div class="form-field"><label for="eventSourceName">Kaynak kurum</label><input id="eventSourceName" required minlength="2" maxlength="100" /></div><div class="form-field"><label for="eventSourceUrl">Resmî kaynak bağlantısı</label><input id="eventSourceUrl" type="url" required maxlength="700" /></div><div class="form-field"><label for="eventVerified">Kaynağın kontrol tarihi</label><input id="eventVerified" type="date" required /></div></div><button class="button button-dark" type="submit">Etkinliği kaydet</button><p id="eventMessage" class="form-message" role="status"></p></form></dialog>
 
     <dialog class="form-dialog wide-dialog" id="journalPickerDialog" aria-labelledby="journalPickerTitle"><button class="form-dialog-close" type="button" data-close="journalPickerDialog" aria-label="Pencereyi kapat">×</button><p class="eyebrow">YENİ BİR SAYFA AÇ</p><h2 id="journalPickerTitle">Nereyi <em>gezdin?</em></h2><p class="section-intro">Bir durak seç; ziyaret tarihini ve aklında kalanları ekle.</p><label class="collection-search"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg><span class="sr-only">Ziyaret ettiğim durağı bul</span><input id="journalPlaceSearch" type="search" placeholder="Durak veya şehir ara…" /></label><div id="journalPlaceChoices" class="journal-place-choices" aria-live="polite"></div></dialog>
+
+
+    <dialog class="form-dialog budget-dialog" id="budgetDialog" aria-labelledby="budgetTitle" aria-describedby="budgetRouteName">
+      <button class="form-dialog-close" data-close="budgetDialog" type="button" aria-label="Bütçeyi kapat">×</button>
+      <div class="budget-heading"><div><p class="eyebrow">ROTANIN HESABI</p><h2 id="budgetTitle">Gezi <em>bütçesi.</em></h2><p id="budgetRouteName" class="budget-route-name"></p></div><span class="handnote">Biraz plan,<br />bolca güzel anı.</span></div>
+      <p class="budget-intro">Planını yap, harcadıklarını ekle. Tüm tutarlar Türk lirası; bütçe bilgilerin paylaşılan rota bağlantısında görünmez.</p>
+      <p id="budgetStatus" class="budget-status" role="status" aria-live="polite"></p><button id="budgetRetry" class="text-button" type="button" hidden>Yeniden dene ↗</button>
+      <div id="budgetContent" hidden>
+        <div class="budget-summary" id="budgetSummary" aria-label="Bütçe özeti"><div><span>PLANLANAN</span><strong id="budgetPlanned">—</strong></div><div><span>HARCANAN</span><strong id="budgetSpent">—</strong></div><div class="budget-balance"><span id="budgetBalanceLabel">KALAN BÜTÇE</span><strong id="budgetBalance">—</strong></div></div>
+        <div class="budget-meter"><progress id="budgetProgress" max="100" value="0" aria-label="Planlanan bütçenin kullanılan yüzdesi"></progress><p id="budgetProgressNote"></p></div>
+        <div class="budget-workspace">
+          <section class="budget-form-paper" aria-labelledby="budgetFormTitle"><p class="eyebrow">KÜÇÜK KALEMLER, NET BİR PLAN</p><h3 id="budgetFormTitle">Yeni bir kalem.</h3>
+            <form id="budgetForm" class="stack-form"><div class="form-grid">
+              <div class="form-field form-field-wide"><label for="budgetItemTitle">Kalem adı</label><input id="budgetItemTitle" required minlength="2" maxlength="80" placeholder="Örn. Müze bileti, öğle yemeği…" /></div>
+              <div class="form-field form-field-wide"><label for="budgetCategory">Kategori</label><select id="budgetCategory"><option value="transport">Ulaşım</option><option value="food">Yeme içme</option><option value="tickets">Giriş ve bilet</option><option value="accommodation">Konaklama</option><option value="other">Diğer</option></select></div>
+              <div class="form-field"><label for="budgetItemPlanned">Planlanan (₺)</label><input id="budgetItemPlanned" type="text" inputmode="decimal" maxlength="10" value="0" required aria-describedby="budgetAmountHint" /></div>
+              <div class="form-field"><label for="budgetItemSpent">Harcanan (₺)</label><input id="budgetItemSpent" type="text" inputmode="decimal" maxlength="10" value="0" required aria-describedby="budgetAmountHint" /></div>
+              <p class="small-note form-field-wide" id="budgetAmountHint">Örnek: 1250,50. Henüz harcamadıysan harcanan tutarı 0 bırak.</p>
+              <div class="form-field form-field-wide"><label for="budgetDate">Harcama tarihi <small>(isteğe bağlı)</small></label><input id="budgetDate" type="date" /></div>
+              <div class="form-field form-field-wide"><label for="budgetNotes">Not <small>(isteğe bağlı)</small></label><textarea id="budgetNotes" maxlength="300" rows="2" placeholder="Hatırlamak istediğin küçük bir detay…"></textarea></div>
+            </div><div class="budget-form-actions"><button id="budgetSave" class="button button-coral" type="submit">Kalemi ekle +</button><button id="budgetCancelEdit" class="text-button" type="button" hidden>Vazgeç</button></div><p id="budgetFormMessage" class="form-message" role="status"></p></form>
+          </section>
+          <section class="budget-category-paper" aria-labelledby="budgetCategoryTitle"><p class="eyebrow">NERELERE AYIRDIK?</p><h3 id="budgetCategoryTitle">Kalem kalem.</h3><table class="budget-category-table"><caption class="sr-only">Kategoriye göre planlanan ve harcanan tutarlar</caption><thead><tr><th scope="col">Kategori</th><th scope="col">Planlanan</th><th scope="col">Harcanan</th></tr></thead><tbody id="budgetCategories"></tbody></table><p class="budget-category-note">Tutarları sen belirlersin.<br />Küçük bir kahve molası da plana dahil.</p><span class="handnote">Yolun tadını çıkar.</span></section>
+        </div>
+        <section class="budget-items-section" aria-labelledby="budgetItemsTitle"><div class="budget-items-heading"><h3 id="budgetItemsTitle">Gezi hesabın.</h3><span id="budgetItemCount"></span></div><div id="budgetItems"></div></section>
+      </div>
+    </dialog>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
   </body>

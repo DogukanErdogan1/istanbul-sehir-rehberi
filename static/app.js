@@ -445,7 +445,7 @@
         <p class="route-card-note">${escapeHtml(route.notes || "Bu yolculuğa kendi hikâyeni ekle.")}</p>
         ${window.GuideFeatures?.statsMarkup(route.metrics) || ""}
         <ol class="route-places">${places.map((place, placeIndex) => `<li><b>${placeIndex + 1}</b><span>${escapeHtml(place.name)}</span></li>`).join("")}</ol>
-        <div class="route-card-actions"><button data-route-view="${route.id}" type="button">Rotayı aç ↗</button><button data-route-edit="${route.id}" type="button">Düzenle</button><button data-route-share="${route.id}" type="button">${route.share_enabled ? "Paylaşımı yönet" : "Paylaş"}</button><button class="route-delete" data-route-delete="${route.id}" type="button">Sil</button></div></div>
+        <div class="route-card-actions"><button data-route-view="${route.id}" type="button">Rotayı aç ↗</button><button data-route-edit="${route.id}" type="button">Düzenle</button><button data-route-budget="${route.id}" type="button">Bütçe</button><button data-route-share="${route.id}" type="button">${route.share_enabled ? "Paylaşımı yönet" : "Paylaş"}</button><button class="route-delete" data-route-delete="${route.id}" type="button">Sil</button></div></div>
       </article>`;
     }).join("");
   }
@@ -960,6 +960,7 @@
   });
 
   window.GuideFeatures?.init({ state, escapeHtml, fetchJson, showToast, showDetails, openAuth, openRouteDialog, loadPlaces, loadFilters, loadCatalog, loadRoutes, renderPlaces, renderProfile });
+  window.GuideBudget?.init({ state, fetchJson, escapeHtml, showToast, openAuth });
   saveFavorites();
   renderAccountUi();
   Promise.allSettled([loadSession(), loadFilters(), loadCatalog()]).then(async () => {
