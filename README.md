@@ -190,3 +190,17 @@ Başlangıçta `route_trips` ve `route_trip_stops` tabloları mevcut kayıtlar k
 API: `GET /api/routes/{route_id}/trip`, `POST /api/routes/{route_id}/trip`. POST için `action` (`start`, `pause`, `resume`, `complete_stop`, `undo_stop`, `restart`) ve GET cevabındaki `expected_revision` gönderilir. Durak işlemleri ayrıca `place_slug` ister. Eski sürümle yapılan işlem `409` döndürür; ekran güncel durumu yükler, işlemi kendiliğinden tekrar uygulamaz. Sonucu alınamayan bir istekte işlem düğmeleri son durum tekrar yüklenene kadar kilitlenir.
 
 Kontroller: `python -m unittest discover -s tests -v`, `node tests/test_trip_ui.cjs` ve `node tests/test_day_planner_ui.cjs`. Gezi API'si testleri `tests/test_trip.py` dosyasındadır. Kod üzerinden form/etkileşim kontrolleri gerçek tarayıcıda görsel doğrulama yerine geçmez.
+
+## Türkçe ve İngilizce
+
+Üst menüdeki **TR / EN** düğmeleri site dilini değiştirir. Varsayılan dil Türkçedir; tercih tarayıcıda saklanır ve sayfa/rota paylaşım bağlantılarına `lang` parametresiyle taşınır. Tarayıcı depolaması kapalı olduğunda da bu bağlantılar dil tercihini korur. Dil değişimi sayfayı yeniden açar.
+
+Menüler, hesap sayfaları, formlar, bütçe, gün planlayıcısı, gezi modu ve takvim iki dili destekler. Katalogdaki 25 durağın açıklamaları, hazır rotalar ve etkinlikler için İngilizce metinler bulunur. İngilizce durak adlarıyla ve Türkçe adlarla arama yapılabilir. Tarih ve sayı biçimleri seçilen dile uyar; tutarlar TRY olarak kalır, döviz dönüşümü yapılmaz. Tarayıcının yerleşik tarih seçicisinin kendi metinleri tarayıcı diline bağlı olabilir.
+
+Kullanıcı adı, kişisel rota adı, günlük, yorum ve bütçe notları yazıldıkları dilde korunur. Katalog çevirileri, yalnızca saklanan Türkçe alan özgün katalog metniyle aynıysa uygulanır. Editörün değiştirdiği/yeni eklediği metinler özgün dilde gösterilir; durak ayrıntısında bunun bilgisi verilir. Düzenleme formları çevrilmiş metni yanlışlıkla kaydetmemek için özgün içeriği kullanır. Çeviri servisi veya API anahtarı gerekmez; veritabanındaki metinler değiştirilmez.
+
+API dili `?lang=tr|en` veya `Accept-Language` başlığından seçilir; açık `lang` tercihi önceliklidir. Dil başlığı bulunmayan eski istemciler Türkçe yanıt alır. Yanıtlarda `Content-Language` ve `Vary: Accept-Language` bulunur. Kişisel alanlar ve doğrulama hatalarındaki kullanıcı girdisi çevrilmez.
+
+Çeviriler `static/locales/` içinde tutulur. Arayüzde yalnızca işaretlenmiş sabit metinler (`data-i18n`, `I18N.text`, `I18N.html`) çevrilir; kullanıcı verilerine toplu metin değiştirme uygulanmaz. Şablon çevirilerinde `fragments.en.json` anahtarları sabit şablon parçalarıyla, boşluklar dahil, birebir eşleşmelidir. Sözlükleri değiştirdikten sonra `python build_i18n.py`, ortak sayfayı değiştirdikten sonra `python build_pages.py` çalıştır. Yeni sürüme geçerken Python sunucusunu yeniden başlat; yalnızca sayfayı yenilemek sunucudaki katalog çevirilerini yüklemez.
+
+Ek kontroller: `tests/test_i18n.py`, `node tests/test_i18n_ui.cjs`. Bunlar dil önceliğini, İngilizce aramayı, kişisel verilerin korunmasını, bütçe/gezi gösterimini ve sayfalar arasında dilin taşınmasını doğrular.

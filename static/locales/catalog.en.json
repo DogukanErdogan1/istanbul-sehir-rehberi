@@ -1,0 +1,542 @@
+{
+  "places": {
+    "ayasofya": {
+      "source": {
+        "name": "Ayasofya",
+        "summary": "İstanbul'un yüzyıllar boyunca farklı kültürlere ev sahipliği yapan en etkileyici yapılarından biri.",
+        "description": "Ayasofya'nın kubbesi, mozaikleri ve katmanlı geçmişi İstanbul'un tarihini tek bir yapıda buluşturuyor. Sultanahmet çevresindeki diğer tarihî noktalarla birlikte gezilebilir.",
+        "duration": "1–2 saat",
+        "best_for": "Tarih ve mimari"
+      },
+      "en": {
+        "name": "Hagia Sophia",
+        "summary": "One of Istanbul's most impressive landmarks, shaped by centuries of different cultures.",
+        "description": "Hagia Sophia brings together Istanbul's history through its dome, mosaics and many layers of the past. Combine your visit with other historic sights around Sultanahmet.",
+        "best_for": "History and architecture",
+        "duration": "1–2 hours"
+      }
+    },
+    "topkapi-sarayi": {
+      "source": {
+        "name": "Topkapı Sarayı",
+        "summary": "Osmanlı saray yaşamını avluları, köşkleri ve koleksiyonlarıyla keşfet.",
+        "description": "Geniş avluları ve farklı dönemlerden eserleriyle Topkapı Sarayı, İstanbul'un tarihini yakından tanımak için kapsamlı bir durak. Geziyi rahatça tamamlamak için yeterli zaman ayırmak iyi olur.",
+        "duration": "2–3 saat",
+        "best_for": "Saray tarihi"
+      },
+      "en": {
+        "name": "Topkapı Palace",
+        "summary": "Discover Ottoman palace life through courtyards, pavilions and collections.",
+        "description": "With spacious courtyards and objects from different periods, Topkapı Palace offers an extensive introduction to Istanbul's history. Allow enough time for an unhurried visit.",
+        "best_for": "Palace history",
+        "duration": "2–3 hours"
+      }
+    },
+    "yerebatan-sarnici": {
+      "source": {
+        "name": "Yerebatan Sarnıcı",
+        "summary": "Sütunların arasında, şehrin altında saklı Bizans döneminden kalma bir su yapısı.",
+        "description": "Loş ışıklandırması ve sütun ormanını andıran iç mekânıyla Yerebatan Sarnıcı, Sultanahmet'in en farklı atmosferlerinden birine sahip. Medusa başlarını görmeyi unutma.",
+        "duration": "45–60 dakika",
+        "best_for": "Mimari ve fotoğraf"
+      },
+      "en": {
+        "name": "Basilica Cistern",
+        "summary": "A Byzantine water structure hidden beneath the city, among rows of columns.",
+        "description": "Soft lighting and a forest of columns give the Basilica Cistern one of Sultanahmet's most distinctive atmospheres. Look out for the Medusa heads.",
+        "best_for": "Architecture and photography",
+        "duration": "45–60 minutes"
+      }
+    },
+    "istanbul-arkeoloji-muzeleri": {
+      "source": {
+        "name": "İstanbul Arkeoloji Müzeleri",
+        "summary": "Antik çağlardan farklı uygarlıkların izlerini bir araya getiren müze kompleksi.",
+        "description": "Birden fazla binaya yayılan koleksiyonlarda antik dönemlerden eserler ve tarihî lahitler yer alıyor. Müze çevresindeki Gülhane Parkı ile aynı güne eklenebilir.",
+        "duration": "1.5–2 saat",
+        "best_for": "Arkeoloji"
+      },
+      "en": {
+        "name": "Istanbul Archaeological Museums",
+        "summary": "A museum complex bringing together traces of ancient civilisations.",
+        "description": "Collections spread across several buildings include ancient objects and historic sarcophagi. You can also visit nearby Gülhane Park on the same day.",
+        "best_for": "Archaeology",
+        "duration": "1.5–2 hours"
+      }
+    },
+    "galata-kulesi": {
+      "source": {
+        "name": "Galata Kulesi",
+        "summary": "Beyoğlu silüetinde yükselen tarihî kuleden Boğaz'a ve Haliç'e bak.",
+        "description": "Galata'nın simge yapılarından kule, çevredeki yokuşlu sokakları ve tarihî binaları keşfetmek için güzel bir başlangıç noktası. Ziyaret öncesinde güncel erişim bilgisini kontrol et.",
+        "duration": "45–90 dakika",
+        "best_for": "Şehir manzarası"
+      },
+      "en": {
+        "name": "Galata Tower",
+        "summary": "Look towards the Bosphorus and Golden Horn from this historic tower above Beyoğlu.",
+        "description": "A landmark of Galata, the tower is a good starting point for exploring steep streets and historic buildings nearby. Check current access information before visiting.",
+        "best_for": "City views",
+        "duration": "45–90 minutes"
+      }
+    },
+    "pera-muzesi": {
+      "source": {
+        "name": "Pera Müzesi",
+        "summary": "Sanat sergileri ve tanınmış koleksiyonlarıyla Beyoğlu'nda keyifli bir kültür molası.",
+        "description": "Pera Müzesi, kalıcı koleksiyonlarının yanı sıra dönemsel sergilere de ev sahipliği yapıyor. İstiklal Caddesi ve çevresindeki kitapçılarla birlikte bir Beyoğlu rotasına eklenebilir.",
+        "duration": "1–2 saat",
+        "best_for": "Sanat"
+      },
+      "en": {
+        "name": "Pera Museum",
+        "summary": "Enjoy an art break in Beyoğlu with exhibitions and well-known collections.",
+        "description": "Pera Museum hosts temporary exhibitions alongside its permanent collections. Add it to a Beyoğlu route with İstiklal Avenue and the surrounding bookshops.",
+        "best_for": "Art",
+        "duration": "1–2 hours"
+      }
+    },
+    "masumiyet-muzesi": {
+      "source": {
+        "name": "Masumiyet Müzesi",
+        "summary": "Bir romanın dünyasını İstanbul'un gündelik hayatından objelerle anlatan özel bir müze.",
+        "description": "Orhan Pamuk'un romanıyla aynı adı taşıyan müze, hikâyedeki karakterlerin eşyalarını ve dönemin İstanbul yaşamını vitrinler aracılığıyla bir araya getiriyor.",
+        "duration": "1–1.5 saat",
+        "best_for": "Edebiyat ve nostalji"
+      },
+      "en": {
+        "name": "Museum of Innocence",
+        "summary": "A distinctive museum telling the world of a novel through everyday objects from Istanbul.",
+        "description": "Sharing its name with Orhan Pamuk's novel, the museum brings together the characters' belongings and Istanbul life of the period in display cases.",
+        "best_for": "Literature and nostalgia",
+        "duration": "1–1.5 hours"
+      }
+    },
+    "dolmabahce-sarayi": {
+      "source": {
+        "name": "Dolmabahçe Sarayı",
+        "summary": "Boğaz kıyısındaki görkemli saray ve tören salonlarını ziyaret et.",
+        "description": "Dolmabahçe Sarayı, Boğaz kıyısındaki konumu ve farklı mimari etkileri taşıyan iç mekânlarıyla öne çıkıyor. Saray bahçesini ve çevredeki sahil yolunu da rotana dahil edebilirsin.",
+        "duration": "2–3 saat",
+        "best_for": "Saray mimarisi"
+      },
+      "en": {
+        "name": "Dolmabahçe Palace",
+        "summary": "Visit a grand palace and ceremonial halls on the Bosphorus waterfront.",
+        "description": "Dolmabahçe Palace stands out for its waterfront setting and interiors reflecting different architectural influences. Include the palace gardens and nearby coastal path in your route.",
+        "best_for": "Palace architecture",
+        "duration": "2–3 hours"
+      }
+    },
+    "rahmi-koc-muzesi": {
+      "source": {
+        "name": "Rahmi M. Koç Müzesi",
+        "summary": "Ulaşım, sanayi ve iletişim tarihini interaktif koleksiyonlarla tanı.",
+        "description": "Haliç kıyısındaki müze; ulaşım araçları, makineler ve günlük yaşam nesneleriyle farklı yaş gruplarına hitap eden geniş bir koleksiyona sahip.",
+        "duration": "2–3 saat",
+        "best_for": "Aile gezisi ve teknoloji tarihi"
+      },
+      "en": {
+        "name": "Rahmi M. Koç Museum",
+        "summary": "Explore transport, industry and communications through interactive collections.",
+        "description": "On the Golden Horn, the museum has a large collection of vehicles, machines and everyday objects appealing to different age groups.",
+        "best_for": "Family trips and technology history",
+        "duration": "2–3 hours"
+      }
+    },
+    "sakip-sabanci-muzesi": {
+      "source": {
+        "name": "Sakıp Sabancı Müzesi",
+        "summary": "Boğaz manzaralı tarihî köşkte sanat ve hat koleksiyonlarını gör.",
+        "description": "Emirgan'da, Boğaz'a bakan bir yamaçta yer alan müze; sanat sergileri ve çevresindeki bahçeyle sakin bir gezi sunuyor.",
+        "duration": "1.5–2 saat",
+        "best_for": "Sanat ve Boğaz manzarası"
+      },
+      "en": {
+        "name": "Sakıp Sabancı Museum",
+        "summary": "Discover art and calligraphy collections in a historic mansion overlooking the Bosphorus.",
+        "description": "Set on a hillside in Emirgan overlooking the Bosphorus, the museum offers a peaceful visit with art exhibitions and surrounding gardens.",
+        "best_for": "Art and Bosphorus views",
+        "duration": "1.5–2 hours"
+      }
+    },
+    "emirgan-korusu": {
+      "source": {
+        "name": "Emirgan Korusu",
+        "summary": "Yürüyüş yolları, köşkleri ve Boğaz manzarasıyla şehirden kısa bir kaçış.",
+        "description": "Emirgan Korusu, geniş yeşil alanları ve Boğaz'a açılan manzarasıyla özellikle açık havada vakit geçirmek isteyenler için güzel bir durak.",
+        "duration": "1–2 saat",
+        "best_for": "Yürüyüş ve piknik"
+      },
+      "en": {
+        "name": "Emirgan Grove",
+        "summary": "Take a short city escape with walking paths, pavilions and Bosphorus views.",
+        "description": "Its spacious green areas and views over the Bosphorus make Emirgan Grove a lovely stop for spending time outdoors.",
+        "best_for": "Walking and picnics",
+        "duration": "1–2 hours"
+      }
+    },
+    "moda-sahili": {
+      "source": {
+        "name": "Moda Sahili",
+        "summary": "Kadıköy'ün sahilinde yürüyüş yap, gün batımını deniz kıyısından izle.",
+        "description": "Moda sahil yolu, deniz kenarında yürüyüş ve gün batımı için sevilen bir buluşma noktası. Kadıköy çarşısı ve Moda'nın kafeleriyle aynı rotada gezilebilir.",
+        "duration": "1–2 saat",
+        "best_for": "Gün batımı ve yürüyüş"
+      },
+      "en": {
+        "name": "Moda Waterfront",
+        "summary": "Walk along Kadıköy's coast and watch the sunset by the sea.",
+        "description": "The Moda coastal path is a popular meeting place for walks and sunsets. Combine it with Kadıköy market and Moda's cafés.",
+        "best_for": "Sunsets and walking",
+        "duration": "1–2 hours"
+      }
+    },
+    "pierreloti-tepesi": {
+      "source": {
+        "name": "Pierre Loti Tepesi",
+        "summary": "Haliç'e yukarıdan bakan seyir noktasında manzaranın tadını çıkar.",
+        "description": "Eyüpsultan'daki seyir noktası, Haliç manzarası ve çevredeki tarihî semt dokusuyla öne çıkıyor. Bölgeye yürüyerek ya da teleferik bağlantısıyla ulaşılabiliyor.",
+        "duration": "1–1.5 saat",
+        "best_for": "Manzara ve fotoğraf"
+      },
+      "en": {
+        "name": "Pierre Loti Hill",
+        "summary": "Enjoy the view from a lookout above the Golden Horn.",
+        "description": "This viewpoint in Eyüpsultan is known for its Golden Horn panorama and the historic neighbourhood around it. You can reach the area on foot or by cable car.",
+        "best_for": "Views and photography",
+        "duration": "1–1.5 hours"
+      }
+    },
+    "suleymaniye-camii": {
+      "source": {
+        "name": "Süleymaniye Camii",
+        "summary": "Mimar Sinan'ın eserini ve çevresindeki tarihî külliye dokusunu keşfet.",
+        "description": "Süleymaniye Camii'nin geniş avlusu ve Haliç'e bakan çevresi, eski İstanbul'u yürüyerek keşfetmek için etkileyici bir rota sunuyor. Ziyaret sırasında ibadet saatlerine saygı göstermeyi unutma.",
+        "duration": "45–90 dakika",
+        "best_for": "Mimari ve şehir tarihi"
+      },
+      "en": {
+        "name": "Süleymaniye Mosque",
+        "summary": "Discover Mimar Sinan's work and the historic complex around it.",
+        "description": "The spacious courtyard and surroundings overlooking the Golden Horn offer an atmospheric way to explore old Istanbul on foot. Please respect prayer times during your visit.",
+        "best_for": "Architecture and city history",
+        "duration": "45–90 minutes"
+      }
+    },
+    "istanbul-modern": {
+      "source": {
+        "name": "İstanbul Modern",
+        "summary": "Türkiye'den ve dünyadan modern sanat eserlerini Boğaz kıyısında gör.",
+        "description": "Karaköy sahilindeki İstanbul Modern, modern ve çağdaş sanat sergileriyle şehir gezisine kültür molası eklemek isteyenler için uygun bir durak.",
+        "duration": "1.5–2 saat",
+        "best_for": "Modern sanat"
+      },
+      "en": {
+        "name": "Istanbul Modern",
+        "summary": "See modern art from Türkiye and around the world on the Bosphorus waterfront.",
+        "description": "On the Karaköy waterfront, Istanbul Modern is a good stop for adding modern and contemporary art exhibitions to a day of exploring the city.",
+        "best_for": "Modern art",
+        "duration": "1.5–2 hours"
+      }
+    },
+    "anitkabir": {
+      "source": {
+        "name": "Anıtkabir",
+        "summary": "Atatürk'ün anıt mezarını ve Cumhuriyet tarihinin izlerini ziyaret et.",
+        "description": "Anıtkabir, anıt mezar, tören alanı ve Atatürk ve Kurtuluş Savaşı Müzesi ile kapsamlı bir ziyaret sunar. Açık alan ve müzeyi birlikte gezmek için zaman ayırabilirsin. Giriş ve ziyaret düzenini resmi sayfadan kontrol et.",
+        "duration": "1.5–2 saat",
+        "best_for": "Cumhuriyet tarihi"
+      },
+      "en": {
+        "name": "Anıtkabir",
+        "summary": "Visit Atatürk's mausoleum and explore the history of the Republic.",
+        "description": "Anıtkabir offers an extensive visit with the mausoleum, ceremonial grounds and Atatürk and War of Independence Museum. Allow time for the outdoor areas and museum. Check the official website for entry and visiting arrangements.",
+        "best_for": "History of the Republic",
+        "duration": "1.5–2 hours"
+      }
+    },
+    "anadolu-medeniyetleri-muzesi": {
+      "source": {
+        "name": "Anadolu Medeniyetleri Müzesi",
+        "summary": "Anadolu'nun uygarlıklarını tarihî bir bedesten ve handa keşfet.",
+        "description": "Mahmutpaşa Bedesteni ve Kurşunlu Han'daki koleksiyon, Anadolu'nun tarihini arkeolojik eserlerle anlatır. Kronolojik sergilemeyi Ankara Kalesi çevresinde bir yürüyüşle birleştirebilirsin.",
+        "duration": "2–3 saat",
+        "best_for": "Arkeoloji ve uygarlıklar"
+      },
+      "en": {
+        "name": "Museum of Anatolian Civilisations",
+        "summary": "Discover Anatolia's civilisations in a historic covered market and inn.",
+        "description": "The collection in Mahmutpaşa Bedesten and Kurşunlu Han tells Anatolia's history through archaeological objects. Combine its chronological displays with a walk around Ankara Castle.",
+        "best_for": "Archaeology and civilisations",
+        "duration": "2–3 hours"
+      }
+    },
+    "ankara-etnografya-muzesi": {
+      "source": {
+        "name": "Ankara Etnografya Müzesi",
+        "summary": "Ahşap, çini, halı ve gündelik yaşam eserleriyle kültür tarihine bak.",
+        "description": "Müzenin salonlarında el sanatları ve farklı dönemlerin yaşam kültürü yer alır. Giriş holündeki anma alanı, Atatürk'ün naaşının Anıtkabir'e taşınmadan önce burada bulunduğu yılları hatırlatır.",
+        "duration": "1–1.5 saat",
+        "best_for": "El sanatları ve kültür"
+      },
+      "en": {
+        "name": "Ankara Ethnography Museum",
+        "summary": "Explore cultural history through woodwork, tiles, carpets and everyday objects.",
+        "description": "The galleries feature crafts and the daily life of different periods. A memorial in the entrance hall recalls the years Atatürk's remains were kept here before being moved to Anıtkabir.",
+        "best_for": "Crafts and culture",
+        "duration": "1–1.5 hours"
+      }
+    },
+    "ankara-kalesi": {
+      "source": {
+        "name": "Ankara Kalesi",
+        "summary": "Tarihî surlardan Ankara'yı izle, kale içi sokaklarını keşfet.",
+        "description": "Kale ve çevresindeki geleneksel evler, eski Ankara'nın dokusunu bir arada gösterir. Bölgede yokuşlar ve basamaklar bulunabilir; yürüyüşünü kendi hareket ihtiyaçlarına göre planla.",
+        "duration": "1–1.5 saat",
+        "best_for": "Manzara ve fotoğraf"
+      },
+      "en": {
+        "name": "Ankara Castle",
+        "summary": "View Ankara from historic walls and explore the streets within the castle.",
+        "description": "The castle and surrounding traditional houses reveal the character of old Ankara. Slopes and steps may be present; plan your walk around your mobility needs.",
+        "best_for": "Views and photography",
+        "duration": "1–1.5 hours"
+      }
+    },
+    "ankara-vakif-eserleri-muzesi": {
+      "source": {
+        "name": "Ankara Vakıf Eserleri Müzesi",
+        "summary": "Vakıf kültüründen halı, kilim ve el sanatlarıyla sakin bir müze molası.",
+        "description": "Vakıf eserlerini bir araya getiren müzede halı, kilim, çini ve çeşitli el sanatı örneklerini görebilirsin. Ulus ve Opera çevresindeki kültür rotasına kısa bir durak olarak eklenebilir.",
+        "duration": "45–60 dakika",
+        "best_for": "Dokuma ve el sanatları"
+      },
+      "en": {
+        "name": "Ankara Museum of Foundation Works",
+        "summary": "Take a quiet museum break with carpets, kilims and traditional crafts.",
+        "description": "See carpets, kilims, tiles and other crafts in a museum of foundation heritage. Add it as a short stop on a cultural route around Ulus and Opera.",
+        "best_for": "Textiles and crafts",
+        "duration": "45–60 minutes"
+      }
+    },
+    "izmir-saat-kulesi": {
+      "source": {
+        "name": "İzmir Saat Kulesi",
+        "summary": "Konak Meydanı'nda İzmir'in simgesiyle buluş.",
+        "description": "1901 yılında tamamlanan Saat Kulesi, Konak Meydanı'nın tarihî odak noktalarından biridir. Çevresindeki meydanı keşfedip Kemeraltı ve Agora yönüne yürüyüşe devam edebilirsin.",
+        "duration": "20–30 dakika",
+        "best_for": "Şehir simgeleri ve fotoğraf"
+      },
+      "en": {
+        "name": "Izmir Clock Tower",
+        "summary": "Meet Izmir's landmark in Konak Square.",
+        "description": "Completed in 1901, the Clock Tower is a historic focal point of Konak Square. Explore the square, then continue walking towards Kemeraltı and the Agora.",
+        "best_for": "City landmarks and photography",
+        "duration": "20–30 minutes"
+      }
+    },
+    "smyrna-agorasi": {
+      "source": {
+        "name": "Smyrna Agorası",
+        "summary": "Şehrin merkezinde antik Smyrna'nın meydanını keşfet.",
+        "description": "Kadifekale'nin kuzey yamacındaki agora, antik kentin kamusal yaşamına dair kalıntılar barındırır. Günümüze ulaşan yapıların önemli bölümü Roma dönemine aittir. Açık alandaki gezi için hava koşullarını dikkate al.",
+        "duration": "1–1.5 saat",
+        "best_for": "Arkeoloji ve antik tarih"
+      },
+      "en": {
+        "name": "Smyrna Agora",
+        "summary": "Discover the public square of ancient Smyrna in the city centre.",
+        "description": "On the northern slope of Kadifekale, the agora preserves remains of the ancient city's public life. Many surviving structures date from the Roman period. Consider the weather for this outdoor visit.",
+        "best_for": "Archaeology and ancient history",
+        "duration": "1–1.5 hours"
+      }
+    },
+    "izmir-ataturk-muzesi": {
+      "source": {
+        "name": "İzmir Atatürk Müzesi",
+        "summary": "Kordon'daki tarihî evde Atatürk'ün İzmir ziyaretlerinin izlerini gör.",
+        "description": "Atatürk'ün İzmir'e geldiğinde kullandığı ev, bugün müze olarak ziyaretçilerini ağırlıyor. İç mekândaki dönem eşyaları ve yapının mimarisi, Kordon yürüyüşüne tarih molası ekler.",
+        "duration": "45–60 dakika",
+        "best_for": "Cumhuriyet tarihi ve mimari"
+      },
+      "en": {
+        "name": "Izmir Atatürk Museum",
+        "summary": "Trace Atatürk's visits to Izmir in a historic house on the Kordon.",
+        "description": "The house Atatürk used during visits to Izmir now welcomes visitors as a museum. Period furnishings and the building's architecture add a history break to a Kordon walk.",
+        "best_for": "Republican history and architecture",
+        "duration": "45–60 minutes"
+      }
+    },
+    "tarihi-asansor": {
+      "source": {
+        "name": "Tarihî Asansör",
+        "summary": "Karataş'ın tarihî asansöründen İzmir Körfezi'ne bak.",
+        "description": "1907'de iki cadde arasındaki yükseklik farkını aşmak için inşa edilen Asansör, şehrin seyir noktalarından biridir. Çevredeki sokaklar ve körfez manzarasıyla kısa bir yürüyüş planlayabilirsin.",
+        "duration": "45–60 dakika",
+        "best_for": "Körfez manzarası"
+      },
+      "en": {
+        "name": "Historic Elevator",
+        "summary": "Look across the Gulf of Izmir from the historic elevator in Karataş.",
+        "description": "Built in 1907 to bridge the height difference between two streets, the elevator is one of the city's viewpoints. Plan a short walk through nearby streets and enjoy the gulf views.",
+        "best_for": "Gulf views",
+        "duration": "45–60 minutes"
+      }
+    },
+    "kulturpark": {
+      "source": {
+        "name": "Kültürpark",
+        "summary": "İzmir'in merkezinde ağaçlı yollarda kültür ve doğa molası ver.",
+        "description": "Fuar geçmişi, sergi alanları ve bitki çeşitliliğiyle Kültürpark şehir içinde geniş bir yeşil alan sunar. Park yürüyüşünü Alsancak ve Kordon çevresindeki duraklarla birleştirebilirsin.",
+        "duration": "1–2 saat",
+        "best_for": "Yürüyüş ve aile gezisi"
+      },
+      "en": {
+        "name": "Kültürpark",
+        "summary": "Take a culture and nature break on leafy paths in central Izmir.",
+        "description": "With its fairground history, exhibition spaces and plant diversity, Kültürpark offers a large green space within the city. Combine a park walk with stops around Alsancak and the Kordon.",
+        "best_for": "Walking and family trips",
+        "duration": "1–2 hours"
+      }
+    }
+  },
+  "templates": {
+    "tarihi-yarimada": {
+      "source": {
+        "title": "Tarihî Yarımada'da bir gün",
+        "description": "Sultanahmet'in büyük yapıları ve arkeoloji koleksiyonlarıyla dolu bir gün. Ziyaret sırasını güncel giriş koşullarına göre düzenleyebilirsin.",
+        "theme": "Tarih"
+      },
+      "en": {
+        "title": "History on the peninsula",
+        "description": "Combine the major landmarks of the historic peninsula in one day. Confirm visiting hours with each institution.",
+        "theme": "History"
+      }
+    },
+    "beyoglu-sanat": {
+      "source": {
+        "title": "Beyoğlu'nda sanat yürüyüşü",
+        "description": "Pera'dan Çukurcuma'ya, Galata'dan Karaköy sahiline uzanan müze ve manzara rotası.",
+        "theme": "Sanat"
+      },
+      "en": {
+        "title": "Art through Beyoğlu",
+        "description": "Walk through Beyoğlu with art, literature and Galata views.",
+        "theme": "Art and city life"
+      }
+    },
+    "emirgan-doga-sanat": {
+      "source": {
+        "title": "Emirgan'da doğa ve sanat",
+        "description": "Koru yürüyüşü ve Boğaz kıyısında bir müze ziyaretini aynı güne sığdır.",
+        "theme": "Doğa ve sanat"
+      },
+      "en": {
+        "title": "A day by the Bosphorus",
+        "description": "Combine art with a grove walk. Plan transport between the stops separately.",
+        "theme": "Art and nature"
+      }
+    },
+    "ankara-kale-arkeoloji": {
+      "source": {
+        "title": "Kale'den uygarlıklara",
+        "description": "Eski Ankara sokaklarını ve Anadolu'nun arkeolojik mirasını birlikte keşfet. Kale bölümü eğimli ve basamaklı olabilir.",
+        "theme": "Arkeoloji"
+      },
+      "en": {
+        "title": "Civilisations around the castle",
+        "description": "Discover the castle and nearby collections on a walk through old Ankara.",
+        "theme": "Archaeology"
+      }
+    },
+    "ankara-kultur-hafiza": {
+      "source": {
+        "title": "Başkentte kültür ve hafıza",
+        "description": "Anıtkabir ziyaretiyle başlayıp Etnografya ve Vakıf Eserleri koleksiyonlarıyla devam et. Duraklar arasındaki ulaşımı ayrıca planla.",
+        "theme": "Kültür"
+      },
+      "en": {
+        "title": "Culture and memory in the capital",
+        "description": "Start at Anıtkabir, then explore the Ethnography and Foundation Works collections. Plan transport between stops separately.",
+        "theme": "Culture"
+      }
+    },
+    "izmir-konak-tarih": {
+      "source": {
+        "title": "Konak'ta tarihin izleri",
+        "description": "Saat Kulesi ve Smyrna Agorası'ndan sonra körfez manzarası için Karataş'a uzan.",
+        "theme": "Tarih ve manzara"
+      },
+      "en": {
+        "title": "Traces of history in Konak",
+        "description": "After the Clock Tower and Smyrna Agora, continue to Karataş for gulf views.",
+        "theme": "History and views"
+      }
+    },
+    "izmir-alsancak-mola": {
+      "source": {
+        "title": "Alsancak'ta kültür molası",
+        "description": "Atatürk Müzesi'ni gördükten sonra Kültürpark'ın ağaçlı yollarında gezinebilirsin.",
+        "theme": "Aile ve kültür"
+      },
+      "en": {
+        "title": "A culture break in Alsancak",
+        "description": "After visiting the Atatürk Museum, stroll along Kültürpark's leafy paths.",
+        "theme": "Family and culture"
+      }
+    }
+  },
+  "events": {
+    "semiha-berksoy-renklerin-aryasi-2026": {
+      "source": {
+        "title": "Semiha Berksoy: Tüm Renklerin Aryası",
+        "description": "Semiha Berksoy'un sahne ve görsel sanatlar arasındaki üretimini bir araya getiren sergi. Güncel bilet ve ziyaret bilgisi resmi sayfada."
+      },
+      "en": {
+        "title": "Semiha Berksoy: Aria of All Colours",
+        "description": "An exhibition bringing together Semiha Berksoy's work across the performing and visual arts. See the official page for current tickets and visiting information."
+      }
+    },
+    "zeliha-berksoy-sergi-turu-2026-10-22": {
+      "source": {
+        "title": "Zeliha Berksoy ile Sergi Turu",
+        "description": "Semiha Berksoy sergisinde Zeliha Berksoy'un anlatımıyla tur. Resmi program: 18.00–19.00; Türkçe, biletli ve sınırlı kontenjanlı."
+      },
+      "en": {
+        "title": "Exhibition Tour with Zeliha Berksoy",
+        "description": "A tour of the Semiha Berksoy exhibition narrated by Zeliha Berksoy. Official programme: 18:00–19:00; in Turkish, ticketed, with limited capacity."
+      }
+    },
+    "blue-revolution-delft-ankara-2026": {
+      "source": {
+        "title": "The Blue Revolution Delft–Ankara",
+        "description": "Anadolu Medeniyetleri Müzesi'nin resmi etkinlik kataloğunda duyurulan sergi. Ayrıntı ve ziyaret koşullarını kurumun duyurusundan kontrol et."
+      },
+      "en": {
+        "title": "The Blue Revolution Delft–Ankara",
+        "description": "An exhibition announced in the Museum of Anatolian Civilisations' official events catalogue. Check the institution's announcement for details and visiting conditions."
+      }
+    },
+    "panorama-hayaller-yerler-2026": {
+      "source": {
+        "title": "Panorama: Hayaller ve Yerler",
+        "description": "Fotoğraf ve mercek temelli sanat üzerine tematik sergi. Resmi bitiş tarihi 18 Ekim 2026; geçmiş etkinlik arşivinde gösterilmelidir."
+      },
+      "en": {
+        "title": "Panorama: Dreams and Places",
+        "description": "A thematic exhibition on photography and lens-based art. The official closing date is 18 October 2026; this entry belongs in the past events archive."
+      }
+    },
+    "elde-vefa-gozde-zarafet-2026": {
+      "source": {
+        "title": "Elde Vefa, Gözde Zarafet: Takı Sanatının 12.000 Yıllık Öyküsü",
+        "description": "Farklı müze koleksiyonlarından seçilen takılarla kültürler arası bir bakış. Resmi duyurudaki 1 Eylül 2026 bitiş tarihi korunmuştur; arşiv kaydıdır."
+      },
+      "en": {
+        "title": "Loyalty in the Hand, Elegance in the Eye: 12,000 Years of Jewellery",
+        "description": "A cross-cultural perspective through jewellery selected from different museum collections. The official closing date of 1 September 2026 is preserved; this is an archive entry."
+      }
+    }
+  }
+}

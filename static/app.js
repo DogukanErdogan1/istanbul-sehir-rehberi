@@ -1,5 +1,6 @@
 (() => {
   "use strict";
+  const I18N = window.GuideI18n || { language: "tr", text: v => v, locale: () => "tr-TR", link: v => v, fold: v => String(v).toLocaleLowerCase("tr-TR"), html: (parts, ...values) => parts.reduce((out, part, index) => out + part + (index < values.length ? values[index] : ""), "") };
 
   const $ = (selector, root = document) => root.querySelector(selector);
   const grid = $("#placeGrid");
@@ -22,17 +23,17 @@
   const adminList = $("#adminList");
   const categoryNames = new Map();
   const categoryArt = {
-    museum: "MÜZE & SANAT",
-    history: "TARİHÎ ROTA",
-    view: "ŞEHİR MANZARASI",
-    nature: "AÇIK HAVA",
-    culture: "KÜLTÜR",
+    museum: I18N.text("MÜZE & SANAT"),
+    history: I18N.text("TARİHÎ ROTA"),
+    view: I18N.text("ŞEHİR MANZARASI"),
+    nature: I18N.text("AÇIK HAVA"),
+    culture: I18N.text("KÜLTÜR"),
   };
   const markLetters = {
     ayasofya: "A",
     "topkapi-sarayi": "T",
     "yerebatan-sarnici": "Y",
-    "istanbul-arkeoloji-muzeleri": "İ",
+    "istanbul-arkeoloji-muzeleri": I18N.text("İ"),
     "galata-kulesi": "G",
     "pera-muzesi": "P",
     "masumiyet-muzesi": "M",
@@ -43,12 +44,12 @@
     "moda-sahili": "M",
     "pierreloti-tepesi": "P",
     "suleymaniye-camii": "S",
-    "istanbul-modern": "İ",
+    "istanbul-modern": I18N.text("İ"),
   };
 
   const state = { query: "", category: "", district: "", city: "istanbul", indoor: false, family: false, accessible: false, sort: "popular", favoritesOnly: false, showAll: false, allPlaces: [], catalog: [], catalogStatus: "idle", catalogError: "", catalogLegacy: false, categories: [], routes: [], journal: [], journalError: "", routesError: "", sessionReady: false, user: null };
   const photos = window.GUIDE_PHOTOS || {};
-  const cityDisplayNames = { istanbul: "İstanbul", ankara: "Ankara", izmir: "İzmir" };
+  const cityDisplayNames = { istanbul: I18N.text("İstanbul"), ankara: "Ankara", izmir: I18N.text("İzmir") };
   const suggestedSlugs = ["istanbul-modern", "yerebatan-sarnici", "emirgan-korusu"];
   let searchTimer;
   let toastTimer;
@@ -90,10 +91,12 @@
   }
 
   async function fetchJson(url, options) {
-    const response = await fetch(url, options);
+    const headers = new Headers(options?.headers);
+    headers.set("Accept-Language", I18N.language);
+    const response = await fetch(url, { ...options, headers });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      const detail = typeof data.detail === "string" ? data.detail : Array.isArray(data.detail) && data.detail[0]?.msg ? data.detail[0].msg.replace(/^Value error,\s*/, "") : "İşlem tamamlanamadı.";
+      const detail = typeof data.detail === "string" ? data.detail : Array.isArray(data.detail) && data.detail[0]?.msg ? data.detail[0].msg.replace(/^Value error,\s*/, "") : I18N.text("İşlem tamamlanamadı.");
       const error = new Error(detail);
       error.status = response.status;
       throw error;
@@ -112,16 +115,16 @@
       categories.forEach((category) => categoryNames.set(category.slug, category.name));
       state.categories = categories;
       categoryChips.innerHTML = [
-        '<button class="chip is-active" data-category="" type="button">Hepsi</button>',
+        I18N.text('<button class="chip is-active" data-category="" type="button">Hepsi</button>'),
         ...categories.map((category) => `<button class="chip" data-category="${escapeHtml(category.slug)}" type="button">${escapeHtml(category.name)}</button>`),
       ].join("");
       updateCategorySelection();
-      districtSelect.innerHTML = '<option value="">Tüm semtler</option>' + districts
+      districtSelect.innerHTML = I18N.text('<option value="">Tüm semtler</option>') + districts
         .map((district) => `<option value="${escapeHtml(district)}">${escapeHtml(district)}</option>`).join("");
       $("#adminCategory").innerHTML = categories
         .map((category) => `<option value="${escapeHtml(category.slug)}">${escapeHtml(category.name)}</option>`).join("");
     } catch {
-      showToast("Filtreler yüklenemedi. Sayfayı yenileyip tekrar dene.");
+      showToast(I18N.text("Filtreler yüklenemedi. Sayfayı yenileyip tekrar dene."));
     }
   }
 
@@ -131,7 +134,7 @@
 
   function placeImage(place) {
     const photo = photos[place.slug];
-    const letter = markLetters[place.slug] || place.name.charAt(0).toLocaleUpperCase("tr-TR");
+    const letter = markLetters[place.slug] || place.name.charAt(0).toLocaleUpperCase(I18N.locale());
     return `<span class="photo-fallback" aria-hidden="true">${escapeHtml(letter)}</span>${photo
       ? `<img class="place-photo" src="${escapeHtml(photo)}" alt="${escapeHtml(place.name)}" loading="lazy" decoding="async" />`
       : ""}`;
@@ -139,9 +142,9 @@
 
   function makeCard(place) {
     const active = favorites.has(place.slug);
-    const category = categoryNames.get(place.category_slug) || categoryArt[place.category_slug] || "İSTANBUL";
-    const reviewText = place.review_count === 1 ? "1 yorum" : `${place.review_count} yorum`;
-    return `
+    const category = categoryNames.get(place.category_slug) || categoryArt[place.category_slug] || I18N.text("İSTANBUL");
+    const reviewText = place.review_count === 1 ? I18N.text("1 yorum") : I18N.html`${place.review_count} yorum`;
+    return I18N.html`
       <article class="place-card" data-category="${escapeHtml(place.category_slug)}">
         <button class="card-image-button" data-open="${escapeHtml(place.slug)}" type="button" aria-label="${escapeHtml(place.name)} ayrıntılarını aç">
           <span class="card-art art-${escapeHtml(place.art)}">
@@ -152,7 +155,7 @@
         <div class="card-content">
           <div class="card-title-row">
             <h3 class="card-title"><button data-open="${escapeHtml(place.slug)}" type="button">${escapeHtml(place.name)}</button></h3>
-            <button class="favorite-button ${active ? "is-active" : ""}" data-favorite="${escapeHtml(place.slug)}" type="button" aria-label="${active ? "Favorilerden çıkar" : "Favorilere ekle"}: ${escapeHtml(place.name)}" aria-pressed="${active}">${heartIcon()}</button>
+            <button class="favorite-button ${active ? "is-active" : ""}" data-favorite="${escapeHtml(place.slug)}" type="button" aria-label="${active ? I18N.text("Favorilerden çıkar") : I18N.text("Favorilere ekle")}: ${escapeHtml(place.name)}" aria-pressed="${active}">${heartIcon()}</button>
           </div>
           <div class="card-footer">
             <span class="card-location">${escapeHtml(place.district)}</span>
@@ -175,13 +178,13 @@
     const showAllButton = $("#showAllPlaces");
     showAllButton.hidden = filtered || visible.length <= 3;
     showAllButton.setAttribute("aria-expanded", String(state.showAll));
-    showAllButton.innerHTML = `${state.showAll ? "Daha az göster" : `Tüm yerleri keşfet (${visible.length})`} <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg>`;
+    showAllButton.innerHTML = `${state.showAll ? I18N.text("Daha az göster") : I18N.html`Tüm yerleri keşfet (${visible.length})`} <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg>`;
     if (state.favoritesOnly) {
-      resultCount.textContent = `${visible.length} kaydedilmiş durak`;
+      resultCount.textContent = I18N.html`${visible.length} kaydedilmiş durak`;
     } else if (suggested) {
-      resultCount.textContent = `${displayed.length} küçük öneri · Keşfedilecek ${visible.length} durak`;
+      resultCount.textContent = I18N.html`${displayed.length} küçük öneri · Keşfedilecek ${visible.length} durak`;
     } else {
-      resultCount.textContent = `${visible.length} güzel durak seni bekliyor`;
+      resultCount.textContent = I18N.html`${visible.length} güzel durak seni bekliyor`;
     }
     window.GuideFeatures?.placesChanged(visible);
   }
@@ -189,7 +192,7 @@
   async function loadPlaces() {
     const requestId = ++placesRequestId;
     grid.setAttribute("aria-busy", "true");
-    resultCount.textContent = "Duraklar aranıyor…";
+    resultCount.textContent = I18N.text("Duraklar aranıyor…");
     const params = new URLSearchParams({ sort: state.sort, limit: "100", city: state.city });
     if (state.indoor) params.set("indoor", "true");
     if (state.family) params.set("family_friendly", "true");
@@ -206,9 +209,9 @@
       grid.innerHTML = "";
       grid.setAttribute("aria-busy", "false");
       emptyState.hidden = false;
-      resultCount.textContent = "Duraklar yüklenemedi";
+      resultCount.textContent = I18N.text("Duraklar yüklenemedi");
       window.GuideFeatures?.placesChanged([]);
-      showToast("Sunucuya ulaşılamadı. Uygulamanın çalıştığından emin ol.");
+      showToast(I18N.text("Sunucuya ulaşılamadı. Uygulamanın çalıştığından emin ol."));
     }
   }
 
@@ -239,19 +242,19 @@
       detailFavorite.classList.toggle("is-active", !wasSaved);
       detailFavorite.setAttribute("aria-pressed", String(!wasSaved));
       detailFavorite.innerHTML = heartIcon();
-      detailFavorite.setAttribute("aria-label", `${wasSaved ? "Favorilere ekle" : "Favorilerden çıkar"}: ${state.allPlaces.find((place) => place.slug === slug)?.name || slug}`);
+      detailFavorite.setAttribute("aria-label", `${wasSaved ? I18N.text("Favorilere ekle") : I18N.text("Favorilerden çıkar")}: ${state.allPlaces.find((place) => place.slug === slug)?.name || slug}`);
     }
     renderPlaces(state.allPlaces);
-    showToast(wasSaved ? "Kaydedilenlerden çıkarıldı." : "Favorilerine kaydedildi.");
+    showToast(wasSaved ? I18N.text("Kaydedilenlerden çıkarıldı.") : I18N.text("Favorilerine kaydedildi."));
   }
 
   function stars(rating) {
-    return `<span class="rating-star" aria-label="${rating} üzerinden 5 yıldız">${"★".repeat(rating)}${"☆".repeat(5 - rating)}</span>`;
+    return I18N.html`<span class="rating-star" aria-label="${rating} üzerinden 5 yıldız">${"★".repeat(rating)}${"☆".repeat(5 - rating)}</span>`;
   }
 
   function reviewMarkup(review) {
     const date = new Date(review.created_at);
-    const dateText = Number.isNaN(date.valueOf()) ? "" : new Intl.DateTimeFormat("tr-TR", { dateStyle: "medium" }).format(date);
+    const dateText = Number.isNaN(date.valueOf()) ? "" : new Intl.DateTimeFormat(I18N.locale(), { dateStyle: "medium" }).format(date);
     return `<article class="review-item">
       <div class="review-item-top"><strong>${escapeHtml(review.author)}</strong><time>${escapeHtml(dateText)}</time></div>
       <div>${stars(Number(review.rating))}</div>
@@ -261,7 +264,7 @@
 
   async function showDetails(slug) {
     detailDialog.showModal();
-    dialogContent.innerHTML = '<div class="dialog-loading">Durak bilgileri yükleniyor…</div>';
+    dialogContent.innerHTML = I18N.text('<div class="dialog-loading">Durak bilgileri yükleniyor…</div>');
     try {
       const result = await fetchJson(`/api/places/${encodeURIComponent(slug)}`);
       renderDetails(result);
@@ -271,13 +274,13 @@
   }
 
   function renderDetails({ place, reviews, user_has_reviewed: hasReviewed }) {
-    const category = categoryNames.get(place.category_slug) || categoryArt[place.category_slug] || "İSTANBUL";
-    const mapsQuery = encodeURIComponent(`${place.name}, ${place.district}, ${place.city_name || "İstanbul"}`);
+    const category = categoryNames.get(place.category_slug) || categoryArt[place.category_slug] || I18N.text("İSTANBUL");
+    const mapsQuery = encodeURIComponent(`${place.name}, ${place.district}, ${place.city_name || I18N.text("İstanbul")}`);
     const reviewForm = !state.user
-      ? '<p class="review-login">Yorum yazmak için <button class="text-button" data-review-login type="button">giriş yap</button>.</p>'
+      ? I18N.text('<p class="review-login">Yorum yazmak için <button class="text-button" data-review-login type="button">giriş yap</button>.</p>')
       : hasReviewed
-        ? '<p class="review-login">Bu durak için yorumunu paylaştın. Teşekkürler!</p>'
-        : `<form class="review-form" id="reviewForm" data-slug="${escapeHtml(place.slug)}">
+        ? I18N.text('<p class="review-login">Bu durak için yorumunu paylaştın. Teşekkürler!</p>')
+        : I18N.html`<form class="review-form" id="reviewForm" data-slug="${escapeHtml(place.slug)}">
           <h3>Senin deneyimin?</h3><p>Bu durağı ziyaret ettiysen kısa bir not bırak.</p>
           <div class="form-grid">
             <div class="form-field"><label for="reviewRating">Puanın</label><select id="reviewRating" name="rating"><option value="5">★★★★★ · Harika</option><option value="4">★★★★☆ · Çok iyi</option><option value="3">★★★☆☆ · İyi</option><option value="2">★★☆☆☆ · Olabilir</option><option value="1">★☆☆☆☆ · Beklentimin altında</option></select></div>
@@ -286,20 +289,20 @@
           <button class="button button-dark" type="submit">Yorumunu ekle <span aria-hidden="true">↗</span></button>
           <p class="form-message" id="formMessage" aria-live="polite"></p>
         </form>`;
-    dialogContent.innerHTML = `
+    dialogContent.innerHTML = I18N.html`
       <div class="dialog-hero card-art art-${escapeHtml(place.art)}">
         ${placeImage(place)}
       </div>
       <div class="dialog-title-row">
         <div><span class="card-category">${escapeHtml(category)}</span><h2 id="dialogTitle">${escapeHtml(place.name)}</h2><p class="dialog-location">⌖ ${escapeHtml(place.district)} · ${escapeHtml(place.address)}</p></div>
-        <button class="favorite-button ${favorites.has(place.slug) ? "is-active" : ""}" data-favorite="${escapeHtml(place.slug)}" type="button" aria-label="${favorites.has(place.slug) ? "Favorilerden çıkar" : "Favorilere ekle"}: ${escapeHtml(place.name)}" aria-pressed="${favorites.has(place.slug)}">${heartIcon()}</button>
+        <button class="favorite-button ${favorites.has(place.slug) ? "is-active" : ""}" data-favorite="${escapeHtml(place.slug)}" type="button" aria-label="${favorites.has(place.slug) ? I18N.text("Favorilerden çıkar") : I18N.text("Favorilere ekle")}: ${escapeHtml(place.name)}" aria-pressed="${favorites.has(place.slug)}">${heartIcon()}</button>
       </div>
       <div class="dialog-stats"><span class="dialog-stat">★ ${Number(place.average_rating).toFixed(1)} · ${place.review_count} yorum</span><span class="dialog-stat">◷ ${escapeHtml(place.duration)}</span><span class="dialog-stat">${escapeHtml(place.best_for)}</span></div>
       <p class="dialog-description">${escapeHtml(place.description)}</p>
       <a class="dialog-map" href="https://www.google.com/maps/search/?api=1&query=${mapsQuery}" target="_blank" rel="noopener noreferrer">Haritada aç <span aria-hidden="true">↗</span></a>
       <section class="review-section" aria-labelledby="reviewsTitle">
         <div class="review-heading"><h3 id="reviewsTitle">Gezgin notları</h3><span>${reviews.length} yorum gösteriliyor</span></div>
-        <div class="review-list">${reviews.length ? reviews.map(reviewMarkup).join("") : '<p class="no-reviews">Henüz yorum yok. İlk notu sen bırak.</p>'}</div>
+        <div class="review-list">${reviews.length ? reviews.map(reviewMarkup).join("") : I18N.text('<p class="no-reviews">Henüz yorum yok. İlk notu sen bırak.</p>')}</div>
         ${reviewForm}
       </section>`;
     window.GuideFeatures?.detailsChanged(place);
@@ -313,13 +316,13 @@
     catalogRequest = (async () => {
       try {
         const result = await fetchJson("/api/places?sort=az&limit=100&city=");
-        if (!Array.isArray(result.items)) throw new Error("Durak listesi okunamadı.");
+        if (!Array.isArray(result.items)) throw new Error(I18N.text("Durak listesi okunamadı."));
         const items = result.items.filter((place) => typeof place.slug === "string" && typeof place.name === "string");
         state.catalogLegacy = items.some((place) => !place.city_slug);
         state.catalog = items.map((place) => {
           // The original API only had these 15 Istanbul landmarks and no city field.
           const city = place.city_slug || (Object.prototype.hasOwnProperty.call(markLetters, place.slug) ? "istanbul" : "");
-          return { ...place, city_slug: city, city_name: place.city_name || ({ istanbul: "İstanbul", ankara: "Ankara", izmir: "İzmir" })[city] || "Şehir bilgisi eksik" };
+          return { ...place, city_slug: city, city_name: place.city_name || ({ istanbul: I18N.text("İstanbul"), ankara: "Ankara", izmir: I18N.text("İzmir") })[city] || I18N.text("Şehir bilgisi eksik") };
         });
         state.catalogStatus = "ready";
         renderAdminList();
@@ -380,8 +383,8 @@
   function renderAccountUi() {
     const signedIn = Boolean(state.user);
     window.GuidePages?.setSession(state.user, state.sessionReady);
-    $("#accountButton").textContent = signedIn ? "Hesabım" : "Giriş yap";
-    $("#accountButton").setAttribute("aria-label", signedIn ? "Hesabım: " + state.user.name : "Giriş yap");
+    $("#accountButton").textContent = signedIn ? I18N.text("Hesabım") : I18N.text("Giriş yap");
+    $("#accountButton").setAttribute("aria-label", signedIn ? I18N.text("Hesabım: ") + state.user.name : I18N.text("Giriş yap"));
     $("#accountButton").disabled = !state.sessionReady;
     $("#accountButton").setAttribute("aria-busy", String(!state.sessionReady));
     $("#demoLoginButton").hidden = !state.sessionReady || signedIn;
@@ -405,7 +408,7 @@
     $("#authNameField").hidden = mode !== "register";
     $("#authName").required = mode === "register";
     $("#authPassword").autocomplete = mode === "register" ? "new-password" : "current-password";
-    $("#authSubmit").innerHTML = mode === "register" ? 'Hesap oluştur <span aria-hidden="true">↗</span>' : 'Giriş yap <span aria-hidden="true">↗</span>';
+    $("#authSubmit").innerHTML = mode === "register" ? I18N.text('Hesap oluştur <span aria-hidden="true">↗</span>') : I18N.text('Giriş yap <span aria-hidden="true">↗</span>');
     authDialog.querySelectorAll("[data-auth-mode]").forEach((tab) => tab.classList.toggle("is-active", tab.dataset.authMode === mode));
   }
 
@@ -417,38 +420,38 @@
   function renderRoutes() {
     const count = $("#routesCount");
     if (!state.user) {
-      routesGrid.innerHTML = '<div class="route-guest"><strong>Rotan henüz başlamadı.</strong><span>Durakları bir araya getirmek için hesabına giriş yap.</span><button data-open-auth type="button">Giriş yap ↗</button></div>';
+      routesGrid.innerHTML = I18N.text('<div class="route-guest"><strong>Rotan henüz başlamadı.</strong><span>Durakları bir araya getirmek için hesabına giriş yap.</span><button data-open-auth type="button">Giriş yap ↗</button></div>');
       count.textContent = "";
       return;
     }
     if (state.routesError) {
-      routesGrid.innerHTML = '<div class="personal-empty"><h3>Rotalarını açamadık.</h3><p>' + escapeHtml(state.routesError) + '</p><button class="button button-dark" data-retry-routes type="button">Yeniden dene</button></div>';
+      routesGrid.innerHTML = I18N.text('<div class="personal-empty"><h3>Rotalarını açamadık.</h3><p>') + escapeHtml(state.routesError) + I18N.text('</p><button class="button button-dark" data-retry-routes type="button">Yeniden dene</button></div>');
       return;
     }
-    const query = $("#personalRouteSearch").value.trim().toLocaleLowerCase("tr-TR");
+    const query = I18N.fold($("#personalRouteSearch").value.trim());
     const city = $("#personalRouteCity").value;
     const routes = state.routes.filter(route => {
-      const haystack = [route.title, route.notes, ...route.places.map(place => place.name)].join(" ").toLocaleLowerCase("tr-TR");
+      const haystack = I18N.fold([route.title, route.notes, ...route.places.map(place => place.name)].join(" "));
       return (!query || haystack.includes(query)) && (!city || route.places.some(place => place.city_slug === city));
     });
-    count.textContent = routes.length + " rota" + (routes.length !== state.routes.length ? " · Toplam " + state.routes.length : " · Yola çıkmaya hazır");
+    count.textContent = routes.length + I18N.text(" rota") + (routes.length !== state.routes.length ? I18N.text(" · Toplam ") + state.routes.length : I18N.text(" · Yola çıkmaya hazır"));
     if (!routes.length) {
       const filtered = Boolean(query || city);
-      routesGrid.innerHTML = `<div class="personal-empty route-page-empty"><svg class="empty-route-doodle" viewBox="0 0 230 100" fill="none" aria-hidden="true"><path d="M10 75C25 5 70 110 100 45S160 15 180 55S210 80 220 30" stroke="currentColor" stroke-width="2" stroke-dasharray="6 7"/><circle cx="10" cy="75" r="6" fill="#dc2d1d"/><path d="m207 35 13-5-1 14" stroke="currentColor" stroke-width="2"/></svg><p class="eyebrow">${filtered ? "BİRAZ BAŞKA BİR YERDEN BAK" : "İLK ADIMI SEN AT"}</p><h3>${filtered ? "Bu aramada bir rota bulamadık." : "Henüz çizilmemiş güzel yollar var."}</h3><p>${filtered ? "Aramanı veya şehir filtresini değiştirerek yeniden deneyebilirsin." : "Bir kahve molası, bir müze kapısı, bir sahil yürüyüşü. İlk rotanı birlikte bir araya getirelim."}</p>${filtered ? '<button class="text-button" data-clear-route-filters type="button">Filtreleri temizle ↗</button>' : '<button class="button button-coral" data-new-route type="button">İlk rotamı çiz ↗</button>'}</div>`;
+      routesGrid.innerHTML = `<div class="personal-empty route-page-empty"><svg class="empty-route-doodle" viewBox="0 0 230 100" fill="none" aria-hidden="true"><path d="M10 75C25 5 70 110 100 45S160 15 180 55S210 80 220 30" stroke="currentColor" stroke-width="2" stroke-dasharray="6 7"/><circle cx="10" cy="75" r="6" fill="#dc2d1d"/><path d="m207 35 13-5-1 14" stroke="currentColor" stroke-width="2"/></svg><p class="eyebrow">${filtered ? I18N.text("BİRAZ BAŞKA BİR YERDEN BAK") : I18N.text("İLK ADIMI SEN AT")}</p><h3>${filtered ? I18N.text("Bu aramada bir rota bulamadık.") : I18N.text("Henüz çizilmemiş güzel yollar var.")}</h3><p>${filtered ? I18N.text("Aramanı veya şehir filtresini değiştirerek yeniden deneyebilirsin.") : I18N.text("Bir kahve molası, bir müze kapısı, bir sahil yürüyüşü. İlk rotanı birlikte bir araya getirelim.")}</p>${filtered ? I18N.text('<button class="text-button" data-clear-route-filters type="button">Filtreleri temizle ↗</button>') : I18N.text('<button class="button button-coral" data-new-route type="button">İlk rotamı çiz ↗</button>')}</div>`;
       return;
     }
     routesGrid.innerHTML = routes.map((route, index) => {
       const places = route.places;
       const cities = [...new Set(places.map(place => place.city_name || cityDisplayNames[place.city_slug]).filter(Boolean))].join(" · ");
       const photo = photos[places[0]?.slug] || "/static/photos/galata-sokak.jpg";
-      return `<article class="route-card">
-        <button class="route-card-photo" data-route-view="${route.id}" type="button" aria-label="${escapeHtml(route.title)} rotasını görüntüle"><img src="${escapeHtml(photo)}" alt="${escapeHtml(places[0]?.name || "Şehir keşfi")}" loading="lazy" /><span class="route-card-number">${String(index + 1).padStart(2, "0")}</span><span class="route-city-badge">${escapeHtml(cities || "Şehir rotası")}</span></button>
+      return I18N.html`<article class="route-card">
+        <button class="route-card-photo" data-route-view="${route.id}" type="button" aria-label="${escapeHtml(route.title)} rotasını görüntüle"><img src="${escapeHtml(photo)}" alt="${escapeHtml(places[0]?.name || I18N.text("Şehir keşfi"))}" loading="lazy" /><span class="route-card-number">${String(index + 1).padStart(2, "0")}</span><span class="route-city-badge">${escapeHtml(cities || I18N.text("Şehir rotası"))}</span></button>
         <div class="route-card-body"><div class="route-card-top"><span>SANA AİT BİR PLAN</span><span>${places.length} DURAK</span></div>
         <h3><button data-route-view="${route.id}" type="button">${escapeHtml(route.title)}</button></h3>
-        <p class="route-card-note">${escapeHtml(route.notes || "Bu yolculuğa kendi hikâyeni ekle.")}</p>
+        <p class="route-card-note">${escapeHtml(route.notes || I18N.text("Bu yolculuğa kendi hikâyeni ekle."))}</p>
         ${window.GuideFeatures?.statsMarkup(route.metrics) || ""}
         <ol class="route-places">${places.map((place, placeIndex) => `<li><b>${placeIndex + 1}</b><span>${escapeHtml(place.name)}</span></li>`).join("")}</ol>
-        <div class="route-card-actions"><button data-route-view="${route.id}" type="button">Rotayı aç ↗</button><button data-route-trip="${route.id}" type="button">Geziye başla ↗</button><button data-route-edit="${route.id}" type="button">Düzenle</button><button data-route-budget="${route.id}" type="button">Bütçe</button><button data-route-share="${route.id}" type="button">${route.share_enabled ? "Paylaşımı yönet" : "Paylaş"}</button><button class="route-delete" data-route-delete="${route.id}" type="button">Sil</button></div></div>
+        <div class="route-card-actions"><button data-route-view="${route.id}" type="button">Rotayı aç ↗</button><button data-route-trip="${route.id}" type="button">Geziye başla ↗</button><button data-route-edit="${route.id}" type="button">Düzenle</button><button data-route-budget="${route.id}" type="button">Bütçe</button><button data-route-share="${route.id}" type="button">${route.share_enabled ? I18N.text("Paylaşımı yönet") : I18N.text("Paylaş")}</button><button class="route-delete" data-route-delete="${route.id}" type="button">Sil</button></div></div>
       </article>`;
     }).join("");
   }
@@ -475,7 +478,7 @@
 
   function profileDate(value) {
     const date = new Date(value + "T12:00:00");
-    return Number.isNaN(date.valueOf()) ? "" : date.toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" });
+    return Number.isNaN(date.valueOf()) ? "" : date.toLocaleDateString(I18N.locale(), { day: "numeric", month: "long", year: "numeric" });
   }
 
   function renderProfile() {
@@ -487,27 +490,27 @@
     if (!state.user) return;
 
     const favoriteGrid = $("#profileFavoritesGrid");
-    const query = $("#profileFavoriteSearch").value.trim().toLocaleLowerCase("tr-TR");
+    const query = I18N.fold($("#profileFavoriteSearch").value.trim());
     const favoritePlaces = [...favorites].map((slug) => state.catalog.find((place) => place.slug === slug)).filter(Boolean)
-      .filter(place => !query || [place.name, place.city_name, place.district].join(" ").toLocaleLowerCase("tr-TR").includes(query));
-    $("#favoritesListCount").textContent = favoritePlaces.length + " durak · Tüm şehirlerde";
+      .filter(place => !query || I18N.fold([place.name, place.city_name, place.district].join(" ")).includes(query));
+    $("#favoritesListCount").textContent = favoritePlaces.length + I18N.text(" durak · Tüm şehirlerde");
     if (favorites.size && state.catalogStatus === "loading") {
-      favoriteGrid.innerHTML = '<div class="profile-empty">Favori durakların yükleniyor…</div>';
+      favoriteGrid.innerHTML = I18N.text('<div class="profile-empty">Favori durakların yükleniyor…</div>');
     } else if (favoritePlaces.length) {
       favoriteGrid.innerHTML = favoritePlaces.map((place) =>
         '<article class="profile-place-card">' +
           '<div class="profile-place-art">' + placeImage(place) + '</div>' +
-          '<div class="profile-place-copy"><p>' + escapeHtml(place.city_name || "Şehir") + ' · ' + escapeHtml(place.district || "") + '</p>' +
+          '<div class="profile-place-copy"><p>' + escapeHtml(place.city_name || I18N.text("Şehir")) + ' · ' + escapeHtml(place.district || "") + '</p>' +
             '<h4><button class="profile-item-title" data-profile-open-place="' + escapeHtml(place.slug) + '" type="button">' + escapeHtml(place.name) + '</button></h4>' +
-            '<button class="text-button" data-profile-remove-favorite="' + escapeHtml(place.slug) + '" type="button">Favorilerimden çıkar</button>' +
+            '<button class="text-button" data-profile-remove-favorite="' + escapeHtml(place.slug) + I18N.text('" type="button">Favorilerimden çıkar</button>') +
           '</div></article>'
       ).join("");
     } else {
       const message = favorites.size && state.catalogStatus === "error"
-        ? "Favoriler yüklenemedi. Sayfayı yenileyip yeniden deneyebilirsin."
-        : query ? "Bu aramada bir favori bulamadık. Farklı bir durak veya şehir adı deneyebilirsin."
-        : "Henüz bir kalp bırakmadın. Merak ettiğin duraklardaki kalp simgesine dokun; bir gün gideceğin yerler burada biriksin.";
-      favoriteGrid.innerHTML = '<div class="profile-empty"><p>' + escapeHtml(message) + '</p><a class="text-link" href="/#places">Durakları keşfet ↗</a></div>';
+        ? I18N.text("Favoriler yüklenemedi. Sayfayı yenileyip yeniden deneyebilirsin.")
+        : query ? I18N.text("Bu aramada bir favori bulamadık. Farklı bir durak veya şehir adı deneyebilirsin.")
+        : I18N.text("Henüz bir kalp bırakmadın. Merak ettiğin duraklardaki kalp simgesine dokun; bir gün gideceğin yerler burada biriksin.");
+      favoriteGrid.innerHTML = '<div class="profile-empty"><p>' + escapeHtml(message) + I18N.text('</p><a class="text-link" href="/#places">Durakları keşfet ↗</a></div>');
     }
 
     const routeGrid = $("#profileRoutesGrid");
@@ -515,11 +518,11 @@
       const places = route.places || [];
       const cities = [...new Set(places.map((place) => place.city_name || cityDisplayNames[place.city_slug]).filter(Boolean))].join(" · ");
       return '<article class="profile-route-item"><div><p class="profile-item-meta">' +
-        places.length + ' DURAK' + (cities ? ' · ' + escapeHtml(cities) : '') + '</p><h4>' +
+        places.length + I18N.text(' DURAK') + (cities ? ' · ' + escapeHtml(cities) : '') + '</p><h4>' +
         escapeHtml(route.title) + '</h4><p class="profile-item-note">' +
-        escapeHtml(route.notes || "Kendi şehir keşif planın.") + '</p></div>' +
-        '<button class="text-button" data-profile-edit-route="' + Number(route.id) + '" type="button">Rotayı düzenle</button></article>';
-    }).join("") : '<div class="profile-empty"><p>Henüz kayıtlı rotan yok. Hazır rotalardan birini ekleyebilir veya yeni bir rota oluşturabilirsin.</p><a class="text-link" href="/#routeTemplates">Hazır rotalara bak ↗</a></div>';
+        escapeHtml(route.notes || I18N.text("Kendi şehir keşif planın.")) + '</p></div>' +
+        '<button class="text-button" data-profile-edit-route="' + Number(route.id) + I18N.text('" type="button">Rotayı düzenle</button></article>');
+    }).join("") : I18N.text('<div class="profile-empty"><p>Henüz kayıtlı rotan yok. Hazır rotalardan birini ekleyebilir veya yeni bir rota oluşturabilirsin.</p><a class="text-link" href="/#routeTemplates">Hazır rotalara bak ↗</a></div>');
 
     const journalGrid = $("#profileJournalGrid");
     if (state.journalError) {
@@ -527,14 +530,14 @@
     } else if (state.journal.length) {
       journalGrid.innerHTML = state.journal.slice(0, 2).map((entry) =>
         '<article class="profile-journal-item"><div class="profile-item-meta"><time datetime="' + escapeHtml(entry.visited_on) + '">' +
-        escapeHtml(profileDate(entry.visited_on)) + '</time><span>' + escapeHtml(entry.city_name || "Şehir") +
+        escapeHtml(profileDate(entry.visited_on)) + '</time><span>' + escapeHtml(entry.city_name || I18N.text("Şehir")) +
         '</span></div><h4><button class="profile-item-title" data-profile-open-place="' + escapeHtml(entry.slug) +
         '" type="button">' + escapeHtml(entry.name) + '</button></h4><p class="profile-item-note">' +
-        escapeHtml(entry.notes || "Bugünden küçük bir hatıra.") + '</p><button class="text-button" data-profile-edit-journal="' +
-        escapeHtml(entry.slug) + '" type="button">Gezi notunu düzenle</button></article>'
+        escapeHtml(entry.notes || I18N.text("Bugünden küçük bir hatıra.")) + '</p><button class="text-button" data-profile-edit-journal="' +
+        escapeHtml(entry.slug) + I18N.text('" type="button">Gezi notunu düzenle</button></article>')
       ).join("");
     } else {
-      journalGrid.innerHTML = '<div class="profile-empty"><p>Günlüğünde henüz ziyaret kaydı yok. Bir durağın ayrıntılarından “Ziyaret ettim” seçeneğini kullanabilirsin.</p><a class="text-link" href="/#places">Bir durak keşfet ↗</a></div>';
+      journalGrid.innerHTML = I18N.text('<div class="profile-empty"><p>Günlüğünde henüz ziyaret kaydı yok. Bir durağın ayrıntılarından “Ziyaret ettim” seçeneğini kullanabilirsin.</p><a class="text-link" href="/#places">Bir durak keşfet ↗</a></div>');
     }
   }
 
@@ -544,17 +547,17 @@
     const options = $("#routePlaceOptions");
     const status = $("#routePickerStatus");
     options.setAttribute("aria-busy", String(state.catalogStatus === "loading"));
-    const cityName = ({ istanbul: "İstanbul", ankara: "Ankara", izmir: "İzmir" })[city] || "Bu şehir";
+    const cityName = ({ istanbul: I18N.text("İstanbul"), ankara: "Ankara", izmir: I18N.text("İzmir") })[city] || I18N.text("Bu şehir");
     if (status) {
-      status.textContent = state.catalogStatus === "loading" ? "Duraklar yükleniyor…" : state.catalogStatus === "error" ? "Duraklar yüklenemedi. Listeyi yeniden yükleyebilirsin." : state.catalogLegacy ? "Sunucunun önceki sürümü açık. İstanbul durakları kullanılabilir; yeni şehirler ve diğer özellikler için uygulamayı yeniden başlat." : `${cityName} · ${places.length} durak seçilebilir.`;
+      status.textContent = state.catalogStatus === "loading" ? I18N.text("Duraklar yükleniyor…") : state.catalogStatus === "error" ? I18N.text("Duraklar yüklenemedi. Listeyi yeniden yükleyebilirsin.") : state.catalogLegacy ? I18N.text("Sunucunun önceki sürümü açık. İstanbul durakları kullanılabilir; yeni şehirler ve diğer özellikler için uygulamayı yeniden başlat.") : I18N.html`${cityName} · ${places.length} durak seçilebilir.`;
     }
     options.innerHTML = places.map((place) => `
       <label class="place-option"><input type="checkbox" value="${escapeHtml(place.slug)}" ${selectedRouteSlugs.includes(place.slug) ? "checked" : ""} />
       <span>${escapeHtml(place.name)}</span><small>${escapeHtml(place.city_name || "")} · ${escapeHtml(place.district)}</small></label>`).join("");
     if (!places.length && state.catalogStatus !== "loading") {
-      options.innerHTML = `<div class="picker-empty"><p>${state.catalogStatus === "error" ? "Durak listesine ulaşılamadı." : state.catalogLegacy ? "Bu şehrin duraklarını açmak için sunucuyu yeniden başlat." : `${escapeHtml(cityName)} için henüz durak eklenmemiş.`}</p><button class="text-button" data-retry-catalog type="button">${state.catalogStatus === "error" ? "Yeniden dene" : "Listeyi yenile"}</button></div>`;
+      options.innerHTML = `<div class="picker-empty"><p>${state.catalogStatus === "error" ? I18N.text("Durak listesine ulaşılamadı.") : state.catalogLegacy ? I18N.text("Bu şehrin duraklarını açmak için sunucuyu yeniden başlat.") : I18N.html`${escapeHtml(cityName)} için henüz durak eklenmemiş.`}</p><button class="text-button" data-retry-catalog type="button">${state.catalogStatus === "error" ? I18N.text("Yeniden dene") : I18N.text("Listeyi yenile")}</button></div>`;
     } else if (state.catalogStatus === "error") {
-      options.insertAdjacentHTML("beforeend", '<button class="text-button picker-retry" data-retry-catalog type="button">Durak listesini yeniden yükle</button>');
+      options.insertAdjacentHTML("beforeend", I18N.text('<button class="text-button picker-retry" data-retry-catalog type="button">Durak listesini yeniden yükle</button>'));
     }
     $("#routeForm button[type='submit']").disabled = places.length === 0 || $("#routeForm").dataset.saving === "true";
     renderSelectedOrder();
@@ -562,9 +565,9 @@
 
   function renderSelectedOrder() {
     $("#routeSelectedOrder").innerHTML = selectedRouteSlugs.length
-      ? `<p>Gezi sırası · Oklarla düzenleyebilirsin</p>${selectedRouteSlugs.map((slug, index) => {
+      ? I18N.html`<p>Gezi sırası · Oklarla düzenleyebilirsin</p>${selectedRouteSlugs.map((slug, index) => {
         const place = state.catalog.find((item) => item.slug === slug);
-        return `<div class="selected-order-item"><b>${index + 1}.</b><span>${escapeHtml(place?.name || slug)}</span><button data-move-up="${index}" type="button" aria-label="Yukarı taşı" ${index === 0 ? "disabled" : ""}>↑</button><button data-move-down="${index}" type="button" aria-label="Aşağı taşı" ${index === selectedRouteSlugs.length - 1 ? "disabled" : ""}>↓</button></div>`;
+        return I18N.html`<div class="selected-order-item"><b>${index + 1}.</b><span>${escapeHtml(place?.name || slug)}</span><button data-move-up="${index}" type="button" aria-label="Yukarı taşı" ${index === 0 ? "disabled" : ""}>↑</button><button data-move-down="${index}" type="button" aria-label="Aşağı taşı" ${index === selectedRouteSlugs.length - 1 ? "disabled" : ""}>↓</button></div>`;
       }).join("")}`
       : "";
     window.GuideFeatures?.selectionChanged([...selectedRouteSlugs]);
@@ -579,7 +582,7 @@
     $("#routeId").value = route?.id || "";
     $("#routeName").value = route?.title || "";
     $("#routeNotes").value = route?.notes || "";
-    $("#routeDialogTitle").innerHTML = route?.id ? 'Rotayı <em>düzenle.</em>' : 'Yeni <em>rota.</em>';
+    $("#routeDialogTitle").innerHTML = route?.id ? I18N.text('Rotayı <em>düzenle.</em>') : I18N.text('Yeni <em>rota.</em>');
     selectedRouteSlugs = route ? route.places.map((place) => place.slug) : [];
     renderRoutePicker();
     routeDialog.showModal();
@@ -588,17 +591,18 @@
 
   function renderAdminList() {
     if (state.user?.role !== "admin") return;
-    adminList.innerHTML = state.catalog.map((place) => `
+    adminList.innerHTML = state.catalog.map((place) => I18N.html`
       <div class="admin-row"><div><strong>${escapeHtml(place.name)}</strong><small>${escapeHtml(place.district)} · ${escapeHtml(categoryNames.get(place.category_slug) || place.category_slug)}</small></div>
       <div class="admin-row-actions"><button data-admin-edit="${escapeHtml(place.slug)}" type="button">Düzenle</button><button data-admin-delete="${escapeHtml(place.slug)}" type="button">Sil</button></div></div>`).join("");
   }
 
   function openAdminDialog(place = null) {
+    if (place?.original_content) place = { ...place, ...place.original_content };
     if (state.user?.role !== "admin") return;
     $("#adminForm").reset();
     $("#adminMessage").textContent = "";
     $("#adminOriginalSlug").value = place?.slug || "";
-    $("#adminDialogTitle").innerHTML = place ? 'Durağı <em>düzenle.</em>' : 'Yeni <em>durak.</em>';
+    $("#adminDialogTitle").innerHTML = place ? I18N.text('Durağı <em>düzenle.</em>') : I18N.text('Yeni <em>durak.</em>');
     const values = {
       adminName: place?.name || "", adminSlug: place?.slug || "", adminCategory: place?.category_slug || state.categories[0]?.slug || "",
       adminDistrict: place?.district || "", adminAddress: place?.address || "", adminSummary: place?.summary || "",
@@ -654,15 +658,15 @@
     };
     const submit = form.querySelector('button[type="submit"]');
     submit.disabled = true;
-    message.textContent = "Yorumun ekleniyor…";
+    message.textContent = I18N.text("Yorumun ekleniyor…");
     try {
       await fetchJson(`/api/places/${encodeURIComponent(form.dataset.slug)}/reviews`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      message.textContent = "Yorumun eklendi, teşekkürler!";
-      showToast("Gezgin notun eklendi.");
+      message.textContent = I18N.text("Yorumun eklendi, teşekkürler!");
+      showToast(I18N.text("Gezgin notun eklendi."));
       await loadPlaces();
       const result = await fetchJson(`/api/places/${encodeURIComponent(form.dataset.slug)}`);
       renderDetails(result);
@@ -689,7 +693,7 @@
       renderAccountUi();
       await loadRoutes();
       if (!window.GuidePlanner?.afterLogin()) window.GuidePages?.afterLogin();
-      showToast("Hoş geldin, " + state.user.name.split(" ")[0] + "!");
+      showToast(I18N.text("Hoş geldin, ") + state.user.name.split(" ")[0] + "!");
     } catch (error) {
       showToast(error.message);
     } finally {
@@ -727,7 +731,7 @@
     const payload = { email: $("#authEmail").value.trim(), password: $("#authPassword").value };
     if (authMode === "register") payload.name = $("#authName").value.trim();
     submit.disabled = true;
-    message.textContent = "İşlem yapılıyor…";
+    message.textContent = I18N.text("İşlem yapılıyor…");
     try {
       const result = await fetchJson(`/api/auth/${authMode === "register" ? "register" : "login"}`, {
         method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
@@ -741,7 +745,7 @@
       authDialog.close();
       form.reset();
       if (!window.GuidePlanner?.afterLogin()) window.GuidePages?.afterLogin();
-      showToast(`Hoş geldin, ${state.user.name.split(" ")[0]}!`);
+      showToast(I18N.html`Hoş geldin, ${state.user.name.split(" ")[0]}!`);
     } catch (error) {
       message.textContent = error.message;
     } finally {
@@ -759,7 +763,7 @@
       renderAccountUi();
       await loadRoutes();
       window.scrollTo({ top: 0, behavior: "smooth" });
-      showToast("Çıkış yapıldı.");
+      showToast(I18N.text("Çıkış yapıldı."));
     } catch (error) { showToast(error.message); }
   });
 
@@ -774,17 +778,17 @@
     const edit = event.target.closest("[data-route-edit]");
     if (edit) return openRouteDialog(state.routes.find((route) => route.id === Number(edit.dataset.routeEdit)));
     const remove = event.target.closest("[data-route-delete]");
-    if (!remove || !window.confirm("Bu rotayı silmek istiyor musun?")) return;
+    if (!remove || !window.confirm(I18N.text("Bu rotayı silmek istiyor musun?"))) return;
     try {
       await fetchJson(`/api/routes/${Number(remove.dataset.routeDelete)}`, { method: "DELETE" });
       await loadRoutes();
-      showToast("Rota silindi.");
+      showToast(I18N.text("Rota silindi."));
     } catch (error) { showToast(error.message); }
   });
 
   $("#routeCitySelect").addEventListener("change", () => {
     state.routeCity = $("#routeCitySelect").value;
-    if (selectedRouteSlugs.length) { selectedRouteSlugs = []; showToast("Yeni şehir için duraklarını seçebilirsin."); }
+    if (selectedRouteSlugs.length) { selectedRouteSlugs = []; showToast(I18N.text("Yeni şehir için duraklarını seçebilirsin.")); }
     renderRoutePicker();
   });
 
@@ -798,7 +802,7 @@
     if (checkbox.checked) {
       if (selectedRouteSlugs.length >= 12) {
         checkbox.checked = false;
-        showToast("Bir rotada en fazla 12 durak olabilir.");
+        showToast(I18N.text("Bir rotada en fazla 12 durak olabilir."));
         return;
       }
       selectedRouteSlugs.push(checkbox.value);
@@ -825,14 +829,14 @@
     if (form.dataset.saving === "true") return;
     const message = $("#routeMessage");
     if (!selectedRouteSlugs.length) {
-      message.textContent = "En az bir durak seç.";
+      message.textContent = I18N.text("En az bir durak seç.");
       return;
     }
     const routeId = $("#routeId").value;
     const submit = form.querySelector('button[type="submit"]');
     form.dataset.saving = "true";
     submit.disabled = true;
-    message.textContent = "Rota kaydediliyor…";
+    message.textContent = I18N.text("Rota kaydediliyor…");
     try {
       await fetchJson(routeId ? `/api/routes/${routeId}` : "/api/routes", {
         method: routeId ? "PUT" : "POST",
@@ -841,7 +845,7 @@
       });
       routeDialog.close();
       await loadRoutes();
-      showToast(routeId ? "Rota güncellendi." : "Rota oluşturuldu.");
+      showToast(routeId ? I18N.text("Rota güncellendi.") : I18N.text("Rota oluşturuldu."));
       if (window.GuidePages?.page === "home") window.GuidePages.navigate("routes");
     } catch (error) { message.textContent = error.message; }
     finally { delete form.dataset.saving; submit.disabled = false; }
@@ -852,11 +856,11 @@
     const edit = event.target.closest("[data-admin-edit]");
     if (edit) return openAdminDialog(state.catalog.find((place) => place.slug === edit.dataset.adminEdit));
     const remove = event.target.closest("[data-admin-delete]");
-    if (!remove || !window.confirm("Bu durağı ve bağlı yorum, favori, günlük kayıtları ile rota duraklarını silmek istiyor musun?")) return;
+    if (!remove || !window.confirm(I18N.text("Bu durağı ve bağlı yorum, favori, günlük kayıtları ile rota duraklarını silmek istiyor musun?"))) return;
     try {
       await fetchJson(`/api/admin/places/${encodeURIComponent(remove.dataset.adminDelete)}`, { method: "DELETE" });
       await refreshPlacesAndFilters();
-      showToast("Durak silindi.");
+      showToast(I18N.text("Durak silindi."));
     } catch (error) { showToast(error.message); }
   });
 
@@ -874,14 +878,14 @@
       ...(window.GuideFeatures?.adminPayload() || {}),
     };
     submit.disabled = true;
-    message.textContent = "Durak kaydediliyor…";
+    message.textContent = I18N.text("Durak kaydediliyor…");
     try {
       await fetchJson(originalSlug ? `/api/admin/places/${encodeURIComponent(originalSlug)}` : "/api/admin/places", {
         method: originalSlug ? "PUT" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
       });
       adminDialog.close();
       await refreshPlacesAndFilters();
-      showToast(originalSlug ? "Durak güncellendi." : "Durak eklendi.");
+      showToast(originalSlug ? I18N.text("Durak güncellendi.") : I18N.text("Durak eklendi."));
     } catch (error) { message.textContent = error.message; }
     finally { submit.disabled = false; }
   });

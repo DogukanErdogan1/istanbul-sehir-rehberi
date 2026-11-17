@@ -73,7 +73,7 @@ const writes = () => requests.filter(r => r.options).length;
   places = []; launch(); await tick(); assert.equal(node("tripEmpty").hidden, false); assert.equal(node("tripJourney").hidden, true); assert.equal(node("tripPrimary").hidden, true);
   const core = fs.readFileSync("static/app.js", "utf8");
   const fetchCode = core.slice(core.indexOf("  async function fetchJson("), core.indexOf("  async function loadFilters("));
-  const scope = { fetch: async () => ({ ok: false, status: 409, json: async () => ({ detail: "Conflict" }) }) };
+  const scope = { Headers, I18N: { language: "tr" }, fetch: async () => ({ ok: false, status: 409, json: async () => ({ detail: "Conflict" }) }) };
   vm.createContext(scope); vm.runInContext(fetchCode, scope); await assert.rejects(scope.fetchJson("/example"), error => error.status === 409 && error.message === "Conflict");
   console.log("PASS: trip launch, persistent-state display, pause/resume, ordered completion, duplicate protection, undo, confirmed restart, 409 refresh, lost-response recovery, stale loads, empty routes, safe directions and HTTP error status.");
 })().catch(error => { console.error(error); process.exitCode = 1; });

@@ -23,6 +23,7 @@ from guide_features import upgrade_database, install_features, route_metrics
 from guide_budget import upgrade_budget_database, install_budget
 from guide_day_planner import install_day_planner
 from guide_trip import upgrade_trip_database, install_trip, sync_trip_progress
+from guide_i18n import LanguageMiddleware, language, place as localize_place, fold
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -38,6 +39,7 @@ app = FastAPI(
     version="2.0.0",
 )
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+app.add_middleware(LanguageMiddleware)
 
 
 CATEGORIES = [
@@ -662,6 +664,7 @@ def list_districts(city: str = "istanbul") -> list[str]:
 
 @app.get("/api/places")
 def list_places(
+    request: Request,
     q: str = Query(default="", max_length=100),
     category: str = Query(default="", max_length=40),
     district: str = Query(default="", max_length=80),
@@ -681,7 +684,8 @@ def list_places(
         if value is not None:
             where.append(f"p.{field} = ?")
             params.append(int(value))
-    if q.strip():
+    english = language(request) == "en"
+    if q.strip() and not english:
         where.append("(p.name LIKE ? OR p.district LIKE ? OR p.summary LIKE ? OR c.name LIKE ?)")
         term = f"%{q.strip()}%"
         params.extend([term, term, term, term])
@@ -700,12 +704,25 @@ def list_places(
     sql = _place_select()
     if where:
         sql += " WHERE " + " AND ".join(where)
-    sql += f" GROUP BY p.id ORDER BY {order_by} LIMIT ?"
-    params.append(limit)
+    sql += f" GROUP BY p.id ORDER BY {order_by}"
+    if not english:
+        sql += " LIMIT ?"
+        params.append(limit)
 
     with db_session() as db:
         rows = db.execute(sql, params).fetchall()
-    return {"items": [_as_place(row) for row in rows], "total": len(rows)}
+    items = [_as_place(row) for row in rows]
+    if english:
+        query = fold(q.strip())
+        for item in items:
+            localize_place(item)
+        if query:
+            fields = ("name", "district", "summary", "description", "category_name", "city_name")
+            items = [item for item in items if query in fold(" ".join(str(item.get(k, "")) for k in fields) + " " + " ".join(item.get("original_content", {}).values()))]
+        if sort == "az":
+            items.sort(key=lambda item: fold(item["name"]))
+        items = items[:limit]
+    return {"items": items, "total": len(items)}
 
 
 def place_details(slug: str, user_id: int | None = None) -> dict:

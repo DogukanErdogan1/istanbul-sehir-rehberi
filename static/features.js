@@ -1,5 +1,6 @@
 (() => {
   'use strict';
+  const I18N = window.GuideI18n;
   const $ = selector => document.querySelector(selector);
   let app;
   let cities = [];
@@ -18,14 +19,14 @@
   let estimateRequest = 0, templateRequest = 0, eventRequest = 0, journalRequest = 0, routeRequest = 0;
   const h = value => app.escapeHtml(value);
   const localDay = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
-  const niceDate = value => new Date(value + 'T12:00:00').toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
-  const duration = minutes => `${Math.floor(minutes / 60) ? Math.floor(minutes / 60) + ' sa ' : ''}${minutes % 60 ? minutes % 60 + ' dk' : ''}`.trim() || '0 dk';
-  const cityInfo = () => cities.find(city => city.slug === app.state.city) || { name: 'İstanbul', latitude: 41.03, longitude: 28.99, zoom: 12 };
+  const niceDate = value => new Date(value + 'T12:00:00').toLocaleDateString(I18N.locale(), { day: 'numeric', month: 'long', year: 'numeric' });
+  const duration = minutes => `${Math.floor(minutes / 60) ? Math.floor(minutes / 60) + I18N.text(' sa ') : ''}${minutes % 60 ? minutes % 60 + I18N.text(' dk') : ''}`.trim() || I18N.text('0 dk');
+  const cityInfo = () => cities.find(city => city.slug === app.state.city) || { name: I18N.text('İstanbul'), latitude: 41.03, longitude: 28.99, zoom: 12 };
   const safeUrl = value => { try { const url = new URL(value); return ['https:', 'http:'].includes(url.protocol) ? url.href : '#'; } catch { return '#'; } };
 
   function statsMarkup(metrics) {
     if (!metrics) return '';
-    return `<div class="route-metrics"><span><b>${metrics.distance_km == null ? '—' : Number(metrics.distance_km).toLocaleString('tr-TR', { maximumFractionDigits: 2 }) + ' km'}</b> ${metrics.distance_kind === 'walking' ? 'yürüyüş yolu' : 'kuş uçuşu'}</span><span><b>${h(duration(metrics.visit_minutes || 0))}</b> önerilen ziyaret</span>${metrics.walking_minutes != null ? `<span><b>${h(duration(metrics.walking_minutes))}</b> yürüyüş</span><span><b>${h(duration(metrics.total_minutes))}</b> toplam</span>` : ''}</div>`;
+    return I18N.html`<div class="route-metrics"><span><b>${metrics.distance_km == null ? '—' : Number(metrics.distance_km).toLocaleString(I18N.locale(), { maximumFractionDigits: 2 }) + ' km'}</b> ${metrics.distance_kind === 'walking' ? I18N.text('yürüyüş yolu') : I18N.text('kuş uçuşu')}</span><span><b>${h(duration(metrics.visit_minutes || 0))}</b> önerilen ziyaret</span>${metrics.walking_minutes != null ? I18N.html`<span><b>${h(duration(metrics.walking_minutes))}</b> yürüyüş</span><span><b>${h(duration(metrics.total_minutes))}</b> toplam</span>` : ''}</div>`;
   }
   const fullStats = metrics => statsMarkup(metrics) + `<p class="small-note">${h(metrics.note || '')}</p>`;
   const errorBox = message => `<div class="feature-empty"><p>${h(message)}</p></div>`;
@@ -35,10 +36,10 @@
     const city = cityInfo();
     const map = window.L.map(id, { scrollWheelZoom: false }).setView([city.latitude, city.longitude], city.zoom);
     const tiles = window.L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> katkıda bulunanlar',
+      maxZoom: 19, attribution: I18N.text('&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> katkıda bulunanlar'),
     }).addTo(map);
     tiles.on('tileerror', () => {
-      if (id === 'discoveryMap') $('#mapStatus').textContent = 'Harita zemini yüklenemedi. İnternet bağlantını kontrol et; durak noktaları seçilebilir.';
+      if (id === 'discoveryMap') $('#mapStatus').textContent = I18N.text('Harita zemini yüklenemedi. İnternet bağlantını kontrol et; durak noktaları seçilebilir.');
     });
     return map;
   }
@@ -51,23 +52,23 @@
   }
   function selectMapPlace(place) {
     const photo = window.GUIDE_PHOTOS?.[place.slug];
-    $('#mapPlaceCard').innerHTML = `${photo ? `<img src="${h(photo)}" alt="${h(place.name)}" />` : ''}<p class="eyebrow">${h(place.category_name)}</p><h3>${h(place.name)}</h3><p>${h(place.city_name)} · ${h(place.district)}</p><p>${h(place.summary)}</p><button class="button button-dark" type="button" data-map-place="${h(place.slug)}">Durağı keşfet ↗</button>`;
+    $('#mapPlaceCard').innerHTML = I18N.html`${photo ? `<img src="${h(photo)}" alt="${h(place.name)}" />` : ''}<p class="eyebrow">${h(place.category_name)}</p><h3>${h(place.name)}</h3><p>${h(place.city_name)} · ${h(place.district)}</p><p>${h(place.summary)}</p><button class="button button-dark" type="button" data-map-place="${h(place.slug)}">Durağı keşfet ↗</button>`;
   }
   function renderMap() {
     if ($('#mapView').hidden) return;
     if (!discoveryMap) {
       discoveryMap = mapFactory('discoveryMap');
-      if (!discoveryMap) { $('#mapStatus').textContent = 'Harita başlatılamadı. Kart görünümünü kullanabilirsin.'; return; }
+      if (!discoveryMap) { $('#mapStatus').textContent = I18N.text('Harita başlatılamadı. Kart görünümünü kullanabilirsin.'); return; }
       discoveryMarkers = window.L.layerGroup().addTo(discoveryMap);
     }
     discoveryMarkers.clearLayers();
     const places = matchingPlaces.filter(place => place.latitude != null && place.longitude != null);
     places.forEach((place, index) => window.L.marker([place.latitude, place.longitude], { icon: pin(index) }).addTo(discoveryMarkers).bindTooltip(h(place.name)).on('click', () => selectMapPlace(place)));
     fitMap(discoveryMap, places);
-    $('#mapStatus').textContent = `${places.length} durak haritada.${places.length < matchingPlaces.length ? ' Konumu eksik duraklar yalnızca kartlarda gösterilir.' : ''} Noktalar yaklaşık konumlardır; giriş kapısını göstermeyebilir.`;
-    $('#resultCount').textContent = `${places.length} durak haritada`;
+    $('#mapStatus').textContent = I18N.html`${places.length} durak haritada.${places.length < matchingPlaces.length ? I18N.text(' Konumu eksik duraklar yalnızca kartlarda gösterilir.') : ''} Noktalar yaklaşık konumlardır; giriş kapısını göstermeyebilir.`;
+    $('#resultCount').textContent = I18N.html`${places.length} durak haritada`;
     $('#showAllPlaces').hidden = true;
-    $('#mapPlaceCard').innerHTML = '<p>Haritadaki bir durağı seç.</p>';
+    $('#mapPlaceCard').innerHTML = I18N.text('<p>Haritadaki bir durağı seç.</p>');
     setTimeout(() => discoveryMap.invalidateSize(), 0);
   }
   function placesChanged(places) { matchingPlaces = places; if (app) renderMap(); }
@@ -80,12 +81,13 @@
   }
   function updateHero() {
     const city = cityInfo();
-    $('#heroCityEyebrow').textContent = `${city.name.toLocaleUpperCase('tr-TR')}${app.state.city === 'ankara' ? "'YI" : "'İ"} YENİDEN GÖR`;
-    if (app.state.city === 'istanbul') $('#heroCityEyebrow').textContent = "İSTANBUL'U YENİDEN GÖR";
+    $('#heroCityEyebrow').textContent = I18N.html`${city.name.toLocaleUpperCase(I18N.locale())}${app.state.city === 'ankara' ? "'YI" : "'İ"} YENİDEN GÖR`;
+    if (app.state.city === 'istanbul') $('#heroCityEyebrow').textContent = I18N.text("İSTANBUL'U YENİDEN GÖR");
+    if (I18N.language === 'en') $('#heroCityEyebrow').textContent = 'REDISCOVER ' + city.name.toLocaleUpperCase(I18N.locale());
     const sets = {
-      istanbul: ['galata-sokak', 'bogaz-vapuru', 'arkeoloji-salonu', "Galata'dan", 'Boğaz', 'Geçmişle'],
-      ankara: ['ankara-kalesi', 'anitkabir', 'anadolu-medeniyetleri-muzesi', "Kale'den", 'Ankara', 'Medeniyetler'],
-      izmir: ['izmir-saat-kulesi', 'tarihi-asansor', 'smyrna-agorasi', "Konak'tan", 'İzmir', 'Antik sokaklar'],
+      istanbul: ['galata-sokak', 'bogaz-vapuru', 'arkeoloji-salonu', I18N.text("Galata'dan"), I18N.text('Boğaz'), I18N.text('Geçmişle')],
+      ankara: ['ankara-kalesi', 'anitkabir', 'anadolu-medeniyetleri-muzesi', I18N.text("Kale'den"), 'Ankara', 'Medeniyetler'],
+      izmir: ['izmir-saat-kulesi', 'tarihi-asansor', 'smyrna-agorasi', I18N.text("Konak'tan"), I18N.text('İzmir'), I18N.text('Antik sokaklar')],
     };
     const values = sets[app.state.city] || sets.istanbul;
     ['.photo-galata', '.photo-ferry', '.photo-museum'].forEach((selector, index) => {
@@ -93,11 +95,15 @@
       if (window.GUIDE_PHOTOS?.[values[index]]) image.src = window.GUIDE_PHOTOS[values[index]];
       image.alt = `${city.name} — ${values[index].replaceAll('-', ' ')}`;
     });
-    $('.hero-collage').setAttribute('aria-label', city.name + "'dan bir gezi defteri");
-    const captions = {
-      istanbul: [["Galata'dan", 'başlayalım.'], ['Boğaz', 'her zaman', 'başka güzel.'], ['Geçmişle', 'bugün arasında', 'bir köprü.']],
-      ankara: [["Kale'den", 'başlayalım.'], ['Başkentte', 'her sokak', 'başka güzel.'], ['Geçmişle', 'bugün arasında', 'bir köprü.']],
-      izmir: [["Konak'tan", 'başlayalım.'], ['Körfez', 'her zaman', 'başka güzel.'], ['Antik çağdan', 'bugüne kalan', 'bir hikâye.']],
+    $('.hero-collage').setAttribute('aria-label', I18N.language === 'en' ? 'A travel notebook from ' + city.name : city.name + "'dan bir gezi defteri");
+    const captions = I18N.language === 'en' ? {
+      istanbul: [['Let us begin', 'in Galata.'], ['The Bosphorus', 'always looks', 'beautiful.'], ['A bridge', 'between past', 'and present.']],
+      ankara: [['Let us begin', 'at the castle.'], ['Every street', 'in the capital', 'has its charm.'], ['A bridge', 'between past', 'and present.']],
+      izmir: [['Let us begin', 'in Konak.'], ['The bay', 'always looks', 'beautiful.'], ['A story', 'from ancient', 'times.']],
+    }[app.state.city] : {
+      istanbul: [[I18N.text("Galata'dan"), I18N.text('başlayalım.')], [I18N.text('Boğaz'), I18N.text('her zaman'), I18N.text('başka güzel.')], [I18N.text('Geçmişle'), I18N.text('bugün arasında'), I18N.text('bir köprü.')]],
+      ankara: [[I18N.text("Kale'den"), I18N.text('başlayalım.')], [I18N.text('Başkentte'), I18N.text('her sokak'), I18N.text('başka güzel.')], [I18N.text('Geçmişle'), I18N.text('bugün arasında'), I18N.text('bir köprü.')]],
+      izmir: [[I18N.text("Konak'tan"), I18N.text('başlayalım.')], [I18N.text('Körfez'), I18N.text('her zaman'), I18N.text('başka güzel.')], [I18N.text('Antik çağdan'), I18N.text('bugüne kalan'), I18N.text('bir hikâye.')]],
     }[app.state.city];
     ['.galata-note', '.ferry-note', '.museum-note'].forEach((selector, index) => {
       const note = $(selector), arrow = note.querySelector('.note-arrow');
@@ -129,8 +135,8 @@
       templates = result.items;
       $('#templatesGrid').innerHTML = templates.length ? templates.map(route => {
         const photo = window.GUIDE_PHOTOS?.[route.places[0]?.slug];
-        return `<article class="template-card">${photo ? `<img src="${h(photo)}" alt="${h(route.places[0].name)}" loading="lazy" />` : ''}<div class="template-content"><p class="eyebrow">${h(route.theme || 'ŞEHİR ROTASI')} · ${route.places.length} DURAK</p><h3>${h(route.title)}</h3><p>${h(route.description)}</p>${statsMarkup(route.metrics)}<div class="feature-actions"><button class="text-button" type="button" data-template-view="${h(route.slug)}">Rotayı incele ↗</button><button class="text-button" type="button" data-template-copy="${h(route.slug)}">Kendime ekle +</button></div></div></article>`;
-      }).join('') : errorBox('Bu şehir için henüz hazır rota yok. Kendi rotanı oluşturabilirsin.');
+        return I18N.html`<article class="template-card">${photo ? `<img src="${h(photo)}" alt="${h(route.places[0].name)}" loading="lazy" />` : ''}<div class="template-content"><p class="eyebrow">${h(route.theme || I18N.text('ŞEHİR ROTASI'))} · ${route.places.length} DURAK</p><h3>${h(route.title)}</h3><p>${h(route.description)}</p>${statsMarkup(route.metrics)}<div class="feature-actions"><button class="text-button" type="button" data-template-view="${h(route.slug)}">Rotayı incele ↗</button><button class="text-button" type="button" data-template-copy="${h(route.slug)}">Kendime ekle +</button></div></div></article>`;
+      }).join('') : errorBox(I18N.text('Bu şehir için henüz hazır rota yok. Kendi rotanı oluşturabilirsin.'));
     } catch (error) { if (request === templateRequest) $('#templatesGrid').innerHTML = errorBox(error.message); }
   }
   function copyRoute(route) {
@@ -153,10 +159,10 @@
     routeRequest++;
     viewedRoute = route;
     $('#routeViewTitle').textContent = route.title;
-    $('#routeViewEyebrow').textContent = shared ? 'PAYLAŞILAN GEZİ PLANI' : 'GEZİ PLANI';
+    $('#routeViewEyebrow').textContent = shared ? I18N.text('PAYLAŞILAN GEZİ PLANI') : I18N.text('GEZİ PLANI');
     $('#routeViewDescription').textContent = route.description || route.notes || '';
     $('#routeViewStats').innerHTML = fullStats(route.metrics);
-    $('#routeViewStops').innerHTML = route.places.map((place, index) => `<li><span>${index + 1}</span><div><button type="button" class="text-button" data-view-stop="${h(place.slug)}">${h(place.name)} ↗</button><small>${h(place.district)} · ${h(duration(place.visit_minutes || 90))} ziyaret</small></div></li>`).join('');
+    $('#routeViewStops').innerHTML = route.places.map((place, index) => I18N.html`<li><span>${index + 1}</span><div><button type="button" class="text-button" data-view-stop="${h(place.slug)}">${h(place.name)} ↗</button><small>${h(place.district)} · ${h(duration(place.visit_minutes || 90))} ziyaret</small></div></li>`).join('');
     $('#routeViewCopy').hidden = Boolean(route.id);
     const ownRoute = !shared && app.state.routes.some(item => item.id === route.id);
     $('#routeViewTrip').hidden = !ownRoute;
@@ -175,8 +181,8 @@
     clearTimeout(estimateTimer);
     const request = ++estimateRequest;
     $('#estimateWalkingButton').disabled = slugs.length < 2;
-    if (!slugs.length) { $('#routeEstimate').innerHTML = '<p class="small-note">Süre ve mesafe için durak seç.</p>'; return; }
-    $('#routeEstimate').textContent = 'Plan hesaplanıyor…';
+    if (!slugs.length) { $('#routeEstimate').innerHTML = I18N.text('<p class="small-note">Süre ve mesafe için durak seç.</p>'); return; }
+    $('#routeEstimate').textContent = I18N.text('Plan hesaplanıyor…');
     estimateTimer = setTimeout(async () => {
       try { const metrics = await calculate(slugs, false); if (request === estimateRequest) $('#routeEstimate').innerHTML = fullStats(metrics); }
       catch (error) { if (request === estimateRequest) $('#routeEstimate').textContent = error.message; }
@@ -186,9 +192,9 @@
     try {
       const result = await app.fetchJson(`/api/routes/${id}/share`, { method: 'POST' });
       shareRouteId = id;
-      $('#shareUrl').value = new URL(result.path, location.origin).href;
+      $('#shareUrl').value = new URL(I18N.link(result.path), location.origin).href;
       $('#shareMessage').textContent = '';
-      $('#shareHint').textContent = ['127.0.0.1', 'localhost'].includes(location.hostname) ? 'Bu sunucu bilgisayarında yerel olarak çalışıyor. Bağlantı başka cihazlardan ancak sunucu o cihazlara erişilebilir olduğunda açılır.' : 'Paylaşımı kapattığında bu bağlantı çalışmaz.';
+      $('#shareHint').textContent = ['127.0.0.1', 'localhost'].includes(location.hostname) ? I18N.text('Bu sunucu bilgisayarında yerel olarak çalışıyor. Bağlantı başka cihazlardan ancak sunucu o cihazlara erişilebilir olduğunda açılır.') : I18N.text('Paylaşımı kapattığında bu bağlantı çalışmaz.');
       $('#shareDialog').showModal();
       await app.loadRoutes();
     } catch (error) { app.showToast(error.message); }
@@ -199,8 +205,12 @@
     $('#detailExtras')?.remove();
     const extra = document.createElement('section'); extra.id = 'detailExtras'; extra.className = 'detail-extras';
     const entry = journal.find(item => item.slug === place.slug);
-    const access = place.wheelchair_accessible === true ? 'Sandalye erişimi: doğrulandı' : place.wheelchair_accessible === false ? 'Sandalye erişimi: uygun değil' : 'Sandalye erişimi: doğrulanmadı';
-    extra.innerHTML = `<h3>Ziyaretini planla.</h3><div class="place-tags"><span>${h(access)}</span>${place.indoor != null ? `<span>${place.indoor ? 'Kapalı mekân' : 'Açık alan'}</span>` : '<span>Kapalı / açık alan: karma veya bilinmiyor</span>'}${place.family_friendly ? '<span>Çocukla gezi önerisi</span>' : ''}</div><p class="small-note">${h(place.accessibility_note || 'Erişim bilgisi henüz doğrulanmadı.')} Konum yaklaşık olabilir; giriş kapısı farklı olabilir.</p>${place.source_url ? `<a class="text-link" href="${h(safeUrl(place.source_url))}" target="_blank" rel="noopener">Kurumun bilgi sayfası ↗</a>` : ''}<div class="visit-journal-action"><button class="button button-dark" data-journal-place="${h(place.slug)}" type="button">${entry ? 'Gezi notumu düzenle' : 'Ziyaret ettim · Günlüğüme ekle'}</button><span class="small-note">${entry ? h(niceDate(entry.visited_on)) + ' tarihinde gezdin.' : 'Tarih ve notların sadece sana görünür.'}</span></div>`;
+    const access = place.wheelchair_accessible === true ? I18N.text('Sandalye erişimi: doğrulandı') : place.wheelchair_accessible === false ? I18N.text('Sandalye erişimi: uygun değil') : I18N.text('Sandalye erişimi: doğrulanmadı');
+    extra.innerHTML = I18N.html`<h3>Ziyaretini planla.</h3><div class="place-tags"><span>${h(access)}</span>${place.indoor != null ? `<span>${place.indoor ? I18N.text('Kapalı mekân') : I18N.text('Açık alan')}</span>` : I18N.text('<span>Kapalı / açık alan: karma veya bilinmiyor</span>')}${place.family_friendly ? I18N.text('<span>Çocukla gezi önerisi</span>') : ''}</div><p class="small-note">${h(place.accessibility_note || I18N.text('Erişim bilgisi henüz doğrulanmadı.'))} Konum yaklaşık olabilir; giriş kapısı farklı olabilir.</p>${place.source_url ? I18N.html`<a class="text-link" href="${h(safeUrl(place.source_url))}" target="_blank" rel="noopener">Kurumun bilgi sayfası ↗</a>` : ''}<div class="visit-journal-action"><button class="button button-dark" data-journal-place="${h(place.slug)}" type="button">${entry ? I18N.text('Gezi notumu düzenle') : I18N.text('Ziyaret ettim · Günlüğüme ekle')}</button><span class="small-note">${entry ? h(niceDate(entry.visited_on)) + I18N.text(' tarihinde gezdin.') : I18N.text('Tarih ve notların sadece sana görünür.')}</span></div>`;
+    if (place.translation_note) {
+      const note = document.createElement('p'); note.className = 'small-note'; note.textContent = place.translation_note;
+      extra.append(note);
+    }
     $('#dialogContent').append(extra);
   }
   async function loadJournal() {
@@ -234,40 +244,40 @@
   }
   function renderJournal() {
     if (!app) return;
-    const query = $('#journalSearch').value.trim().toLocaleLowerCase('tr-TR');
+    const query = I18N.fold($('#journalSearch').value.trim());
     const city = $('#journalCity').value;
     const entries = journal.filter(entry => (!city || entry.city_slug === city) &&
-      (!query || [entry.name, entry.city_name, entry.notes].join(' ').toLocaleLowerCase('tr-TR').includes(query)))
+      (!query || I18N.fold([entry.name, entry.city_name, entry.notes].join(' ')).includes(query)))
       .sort((a, b) => $('#journalSort').value === 'oldest' ? a.visited_on.localeCompare(b.visited_on) : b.visited_on.localeCompare(a.visited_on));
-    $('#journalCount').textContent = app.state.user ? `${entries.length} anı · ${new Set(entries.map(entry => entry.city_slug)).size} şehir` : '';
+    $('#journalCount').textContent = app.state.user ? I18N.html`${entries.length} anı · ${new Set(entries.map(entry => entry.city_slug)).size} şehir` : '';
     if (!app.state.user) { $('#journalGrid').innerHTML = ''; return; }
     if (app.state.journalError) { $('#journalGrid').innerHTML = errorBox(app.state.journalError); return; }
     if (!entries.length) {
       const filtered = Boolean(query || city);
-      $('#journalGrid').innerHTML = `<div class="personal-empty journal-page-empty"><div class="empty-notebook" aria-hidden="true"><span>şehirarası</span><b>İLK SAYFA</b><i>♡</i></div><p class="eyebrow">${filtered ? "BAŞKA BİR SAYFAYA BAKALIM" : "HER HİKÂYE BİR İLKLE BAŞLAR"}</p><h3>${filtered ? "Bu aramada bir anı bulamadık." : "İlk sayfa seni bekliyor."}</h3><p>${filtered ? "Aramanı veya şehir filtresini değiştirerek diğer ziyaretlerini görebilirsin." : "Gezdiğin bir yeri, o günün tarihini ve aklında kalan küçük bir detayı ekle. Güzel günler burada biriksin."}</p>${filtered ? '<button class="text-button" data-clear-journal-filters type="button">Filtreleri temizle ↗</button>' : '<button class="button button-dark" data-add-journal type="button">İlk anımı ekle +</button>'}</div>`;
+      $('#journalGrid').innerHTML = I18N.html`<div class="personal-empty journal-page-empty"><div class="empty-notebook" aria-hidden="true"><span>şehirarası</span><b>İLK SAYFA</b><i>♡</i></div><p class="eyebrow">${filtered ? I18N.text("BAŞKA BİR SAYFAYA BAKALIM") : I18N.text("HER HİKÂYE BİR İLKLE BAŞLAR")}</p><h3>${filtered ? I18N.text("Bu aramada bir anı bulamadık.") : I18N.text("İlk sayfa seni bekliyor.")}</h3><p>${filtered ? I18N.text("Aramanı veya şehir filtresini değiştirerek diğer ziyaretlerini görebilirsin.") : I18N.text("Gezdiğin bir yeri, o günün tarihini ve aklında kalan küçük bir detayı ekle. Güzel günler burada biriksin.")}</p>${filtered ? I18N.text('<button class="text-button" data-clear-journal-filters type="button">Filtreleri temizle ↗</button>') : I18N.text('<button class="button button-dark" data-add-journal type="button">İlk anımı ekle +</button>')}</div>`;
       return;
     }
     const groups = new Map();
     entries.forEach(entry => { const month = entry.visited_on.slice(0, 7); if (!groups.has(month)) groups.set(month, []); groups.get(month).push(entry); });
     $('#journalGrid').innerHTML = [...groups].map(([month, items]) => {
-      const monthName = new Date(month + '-01T12:00:00').toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' });
-      return `<section class="journal-month" aria-label="${h(monthName)}"><div class="journal-month-heading"><h3>${h(monthName)}</h3><span>${items.length} güzel hatıra</span></div><div class="journal-entries">${items.map(entry => {
+      const monthName = new Date(month + '-01T12:00:00').toLocaleDateString(I18N.locale(), { month: 'long', year: 'numeric' });
+      return I18N.html`<section class="journal-month" aria-label="${h(monthName)}"><div class="journal-month-heading"><h3>${h(monthName)}</h3><span>${items.length} güzel hatıra</span></div><div class="journal-entries">${items.map(entry => {
         const photo = window.GUIDE_PHOTOS?.[entry.slug] || '/static/photos/galata-sokak.jpg';
         const day = new Date(entry.visited_on + 'T12:00:00').getDate();
-        const shortMonth = new Date(entry.visited_on + 'T12:00:00').toLocaleDateString('tr-TR', { month: 'short' });
-        return `<article class="journal-card"><div class="journal-entry-photo"><img src="${h(photo)}" alt="${h(entry.name)}" loading="lazy" /><span class="journal-date-ticket"><b>${day}</b><span>${h(shortMonth)}</span></span></div><div class="journal-entry-copy"><p class="journal-entry-city"><svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg>${h(entry.city_name)} · ${h(entry.district)}</p><h4><button class="text-button" data-journal-detail="${h(entry.slug)}" type="button">${h(entry.name)}</button></h4><p class="journal-note">${h(entry.notes || 'Bugünden küçük bir hatıra. Bu sayfaya aklında kalanları ekleyebilirsin.')}</p><div class="journal-entry-footer"><time datetime="${h(entry.visited_on)}">${h(niceDate(entry.visited_on))}</time><button class="text-button" data-journal-place="${h(entry.slug)}" type="button">Notumu düzenle ↗</button></div></div></article>`;
+        const shortMonth = new Date(entry.visited_on + 'T12:00:00').toLocaleDateString(I18N.locale(), { month: 'short' });
+        return I18N.html`<article class="journal-card"><div class="journal-entry-photo"><img src="${h(photo)}" alt="${h(entry.name)}" loading="lazy" /><span class="journal-date-ticket"><b>${day}</b><span>${h(shortMonth)}</span></span></div><div class="journal-entry-copy"><p class="journal-entry-city"><svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg>${h(entry.city_name)} · ${h(entry.district)}</p><h4><button class="text-button" data-journal-detail="${h(entry.slug)}" type="button">${h(entry.name)}</button></h4><p class="journal-note">${h(entry.notes || I18N.text('Bugünden küçük bir hatıra. Bu sayfaya aklında kalanları ekleyebilirsin.'))}</p><div class="journal-entry-footer"><time datetime="${h(entry.visited_on)}">${h(niceDate(entry.visited_on))}</time><button class="text-button" data-journal-place="${h(entry.slug)}" type="button">Notumu düzenle ↗</button></div></div></article>`;
       }).join('')}</div></section>`;
     }).join('');
   }
   function renderJournalPicker() {
-    const query = $('#journalPlaceSearch').value.trim().toLocaleLowerCase('tr-TR');
-    const places = app.state.catalog.filter(place => !query || [place.name, place.city_name, place.district].join(' ').toLocaleLowerCase('tr-TR').includes(query));
-    if (app.state.catalogStatus === 'loading') { $('#journalPlaceChoices').innerHTML = errorBox('Duraklar yükleniyor…'); return; }
+    const query = I18N.fold($('#journalPlaceSearch').value.trim());
+    const places = app.state.catalog.filter(place => !query || I18N.fold([place.name, place.city_name, place.district].join(' ')).includes(query));
+    if (app.state.catalogStatus === 'loading') { $('#journalPlaceChoices').innerHTML = errorBox(I18N.text('Duraklar yükleniyor…')); return; }
     $('#journalPlaceChoices').innerHTML = places.length ? places.map(place => {
       const photo = window.GUIDE_PHOTOS?.[place.slug];
       const existing = journal.some(entry => entry.slug === place.slug);
-      return `<button class="journal-place-choice" data-journal-place="${h(place.slug)}" type="button">${photo ? `<img src="${h(photo)}" alt="" loading="lazy" />` : ''}<span><strong>${h(place.name)}</strong><small>${h(place.city_name)} · ${h(place.district)}${existing ? ' · Günlüğünde var' : ''}</small></span><b aria-hidden="true">↗</b></button>`;
-    }).join('') : errorBox(app.state.catalogStatus === 'error' ? 'Durak listesi yüklenemedi. Pencereyi kapatıp yeniden deneyebilirsin.' : 'Bu aramada durak bulunamadı.');
+      return `<button class="journal-place-choice" data-journal-place="${h(place.slug)}" type="button">${photo ? `<img src="${h(photo)}" alt="" loading="lazy" />` : ''}<span><strong>${h(place.name)}</strong><small>${h(place.city_name)} · ${h(place.district)}${existing ? I18N.text(' · Günlüğünde var') : ''}</small></span><b aria-hidden="true">↗</b></button>`;
+    }).join('') : errorBox(app.state.catalogStatus === 'error' ? I18N.text('Durak listesi yüklenemedi. Pencereyi kapatıp yeniden deneyebilirsin.') : I18N.text('Bu aramada durak bulunamadı.'));
   }
   async function openJournalPicker() {
     if (!app.state.user) { app.openAuth('login'); return; }
@@ -308,32 +318,33 @@
     const [year, index] = month.split('-').map(Number);
     const offset = (new Date(year, index - 1, 1).getDay() + 6) % 7;
     const last = new Date(year, index, 0).getDate();
-    let markup = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'].map(day => `<span class="calendar-weekday">${day}</span>`).join('');
+    let markup = [I18N.text('Pzt'), I18N.text('Sal'), I18N.text('Çar'), I18N.text('Per'), I18N.text('Cum'), I18N.text('Cmt'), I18N.text('Paz')].map(day => `<span class="calendar-weekday">${day}</span>`).join('');
     markup += '<span></span>'.repeat(offset);
     for (let day = 1; day <= last; day++) {
       const key = month + '-' + String(day).padStart(2, '0');
       const count = events.filter(event => event.start_date <= key && event.end_date >= key).length;
-      markup += `<button type="button" class="calendar-day${count ? ' has-events' : ''}${key === localDay() ? ' is-today' : ''}" data-event-day="${key}" aria-pressed="${key === selectedDay}" aria-label="${h(niceDate(key))}, ${count} etkinlik">${day}${count ? `<small>${count}</small>` : ''}</button>`;
+      markup += I18N.html`<button type="button" class="calendar-day${count ? ' has-events' : ''}${key === localDay() ? ' is-today' : ''}" data-event-day="${key}" aria-pressed="${key === selectedDay}" aria-label="${h(niceDate(key))}, ${count} etkinlik">${day}${count ? `<small>${count}</small>` : ''}</button>`;
     }
     $('#eventCalendar').innerHTML = markup;
     $('#clearEventDay').hidden = !selectedDay;
   }
   function renderEvents() {
     const visible = selectedDay ? events.filter(event => event.start_date <= selectedDay && event.end_date >= selectedDay) : events;
-    $('#eventsGrid').innerHTML = visible.length ? visible.map(event => `<article class="event-card"><div class="event-dates"><time datetime="${h(event.start_date)}">${h(niceDate(event.start_date))}</time> — <time datetime="${h(event.end_date)}">${h(niceDate(event.end_date))}</time>${event.end_date < localDay() ? ' · Sona erdi' : ''}</div><h3>${h(event.title)}</h3>${event.place_name ? `<button class="text-button" data-event-place="${h(event.place_slug)}" type="button">${h(event.place_name)} ↗</button>` : ''}<p>${h(event.description)}</p><a class="text-link" href="${h(safeUrl(event.source_url))}" target="_blank" rel="noopener">${h(event.source_name)} · Resmî kaynak ↗</a><p class="small-note">Kaynak kontrolü: ${h(niceDate(event.verified_on))}</p>${app.state.user?.role === 'admin' ? `<div class="feature-actions"><button class="text-button" data-event-edit="${event.id}" type="button">Düzenle</button><button class="text-button" data-event-delete="${event.id}" type="button">Sil</button></div>` : ''}</article>`).join('') : errorBox(selectedDay ? 'Bu gün için doğrulanmış etkinlik bulunamadı. Ayın tamamını görüntüleyebilirsin.' : 'Seçili şehir ve ay için doğrulanmış etkinlik bulunamadı. Başka bir ay seçebilir veya geçmiş etkinlikleri açabilirsin.');
+    $('#eventsGrid').innerHTML = visible.length ? visible.map(event => I18N.html`<article class="event-card"><div class="event-dates"><time datetime="${h(event.start_date)}">${h(niceDate(event.start_date))}</time> — <time datetime="${h(event.end_date)}">${h(niceDate(event.end_date))}</time>${event.end_date < localDay() ? I18N.text(' · Sona erdi') : ''}</div><h3>${h(event.title)}</h3>${event.place_name ? `<button class="text-button" data-event-place="${h(event.place_slug)}" type="button">${h(event.place_name)} ↗</button>` : ''}<p>${h(event.description)}</p><a class="text-link" href="${h(safeUrl(event.source_url))}" target="_blank" rel="noopener">${h(event.source_name)} · Resmî kaynak ↗</a><p class="small-note">Kaynak kontrolü: ${h(niceDate(event.verified_on))}</p>${app.state.user?.role === 'admin' ? I18N.html`<div class="feature-actions"><button class="text-button" data-event-edit="${event.id}" type="button">Düzenle</button><button class="text-button" data-event-delete="${event.id}" type="button">Sil</button></div>` : ''}</article>`).join('') : errorBox(selectedDay ? I18N.text('Bu gün için doğrulanmış etkinlik bulunamadı. Ayın tamamını görüntüleyebilirsin.') : I18N.text('Seçili şehir ve ay için doğrulanmış etkinlik bulunamadı. Başka bir ay seçebilir veya geçmiş etkinlikleri açabilirsin.'));
   }
   function populateEventPlaces(value = '') {
-    $('#eventPlace').innerHTML = '<option value="">Bağımsız etkinlik</option>' + app.state.catalog.filter(place => place.city_slug === $('#eventCity').value).map(place => `<option value="${h(place.slug)}">${h(place.name)}</option>`).join('');
+    $('#eventPlace').innerHTML = I18N.text('<option value="">Bağımsız etkinlik</option>') + app.state.catalog.filter(place => place.city_slug === $('#eventCity').value).map(place => `<option value="${h(place.slug)}">${h(place.name)}</option>`).join('');
     $('#eventPlace').value = value;
   }
   function openEvent(event = null) {
+    if (event?.original_content) event = { ...event, ...event.original_content };
     if (app.state.user?.role !== 'admin') return;
     $('#eventForm').reset(); $('#eventMessage').textContent = '';
     const values = { eventId: event?.id || '', eventTitle: event?.title || '', eventSlug: event?.slug || '', eventCity: event?.city_slug || app.state.city,
       eventStart: event?.start_date || localDay(), eventEnd: event?.end_date || localDay(), eventDescription: event?.description || '', eventSourceName: event?.source_name || '', eventSourceUrl: event?.source_url || '', eventVerified: event?.verified_on || localDay() };
     Object.entries(values).forEach(([id, value]) => { $('#' + id).value = value; });
     $('#eventVerified').max = localDay(); populateEventPlaces(event?.place_slug || '');
-    $('#eventDialogTitle').textContent = event ? 'Etkinliği düzenle.' : 'Yeni etkinlik.';
+    $('#eventDialogTitle').textContent = event ? I18N.text('Etkinliği düzenle.') : I18N.text('Yeni etkinlik.');
     $('#eventDialog').showModal();
   }
   function populateAdmin(place) {
@@ -372,37 +383,37 @@
     $('#listViewButton').addEventListener('click', () => { $('#mapView').hidden = true; $('#placeGrid').hidden = false; $('#mapViewButton').setAttribute('aria-pressed', 'false'); $('#listViewButton').setAttribute('aria-pressed', 'true'); app.renderPlaces(app.state.allPlaces); });
     $('#estimateWalkingButton').addEventListener('click', async () => {
       clearTimeout(estimateTimer); const request = ++estimateRequest; $('#estimateWalkingButton').disabled = true;
-      $('#routeEstimate').textContent = 'Yürünebilir yol hesaplanıyor…';
+      $('#routeEstimate').textContent = I18N.text('Yürünebilir yol hesaplanıyor…');
       try { const metrics = await calculate([...selectedSlugs], true); if (request === estimateRequest) $('#routeEstimate').innerHTML = fullStats(metrics); }
       catch (error) { if (request === estimateRequest) $('#routeEstimate').textContent = error.message; }
       finally { if (request === estimateRequest) $('#estimateWalkingButton').disabled = selectedSlugs.length < 2; }
     });
     $('#routeViewWalking').addEventListener('click', async () => {
       if (!viewedRoute) return; const request = ++routeRequest; $('#routeViewWalking').disabled = true;
-      $('#routeViewStats').textContent = 'Yürünebilir yol hesaplanıyor…';
+      $('#routeViewStats').textContent = I18N.text('Yürünebilir yol hesaplanıyor…');
       try { const metrics = await calculate(viewedRoute.places.map(place => place.slug), true); if (request === routeRequest) { viewedRoute.metrics = metrics; $('#routeViewStats').innerHTML = fullStats(metrics); drawRouteMap(viewedRoute); } }
       catch (error) { if (request === routeRequest) $('#routeViewStats').textContent = error.message; }
       finally { if (request === routeRequest) $('#routeViewWalking').disabled = viewedRoute.places.length < 2; }
     });
     $('#routeViewCopy').addEventListener('click', () => { if (viewedRoute) copyRoute(viewedRoute); });
     $('#copyShareButton').addEventListener('click', async () => {
-      try { await navigator.clipboard.writeText($('#shareUrl').value); $('#shareMessage').textContent = 'Bağlantı kopyalandı.'; }
-      catch { $('#shareUrl').focus(); $('#shareUrl').select(); $('#shareMessage').textContent = 'Bağlantı seçildi. Ctrl+C ile kopyalayabilirsin.'; }
+      try { await navigator.clipboard.writeText($('#shareUrl').value); $('#shareMessage').textContent = I18N.text('Bağlantı kopyalandı.'); }
+      catch { $('#shareUrl').focus(); $('#shareUrl').select(); $('#shareMessage').textContent = I18N.text('Bağlantı seçildi. Ctrl+C ile kopyalayabilirsin.'); }
     });
     $('#revokeShareButton').addEventListener('click', async () => {
       if (!shareRouteId) return;
-      try { await app.fetchJson(`/api/routes/${shareRouteId}/share`, { method: 'DELETE' }); $('#shareDialog').close(); app.showToast('Rota paylaşımı kapatıldı.'); await app.loadRoutes(); }
+      try { await app.fetchJson(`/api/routes/${shareRouteId}/share`, { method: 'DELETE' }); $('#shareDialog').close(); app.showToast(I18N.text('Rota paylaşımı kapatıldı.')); await app.loadRoutes(); }
       catch (error) { $('#shareMessage').textContent = error.message; }
     });
     $('#journalForm').addEventListener('submit', async event => {
       event.preventDefault(); const button = $('#journalForm button[type="submit"]'); button.disabled = true;
-      try { await app.fetchJson('/api/journal/' + encodeURIComponent($('#journalSlug').value), { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ visited_on: $('#journalDate').value, notes: $('#journalNotes').value }) }); $('#journalDialog').close(); await loadJournal(); app.showToast('Gezi notun kaydedildi.'); }
+      try { await app.fetchJson('/api/journal/' + encodeURIComponent($('#journalSlug').value), { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ visited_on: $('#journalDate').value, notes: $('#journalNotes').value }) }); $('#journalDialog').close(); await loadJournal(); app.showToast(I18N.text('Gezi notun kaydedildi.')); }
       catch (error) { $('#journalMessage').textContent = error.message; }
       finally { button.disabled = false; }
     });
     $('#removeJournalButton').addEventListener('click', async () => {
-      if (!confirm('Bu özel gezi notunu silmek istiyor musun?')) return;
-      try { await app.fetchJson('/api/journal/' + encodeURIComponent($('#journalSlug').value), { method: 'DELETE' }); $('#journalDialog').close(); await loadJournal(); app.showToast('Gezi notu silindi.'); }
+      if (!confirm(I18N.text('Bu özel gezi notunu silmek istiyor musun?'))) return;
+      try { await app.fetchJson('/api/journal/' + encodeURIComponent($('#journalSlug').value), { method: 'DELETE' }); $('#journalDialog').close(); await loadJournal(); app.showToast(I18N.text('Gezi notu silindi.')); }
       catch (error) { $('#journalMessage').textContent = error.message; }
     });
     $('#eventMonth').addEventListener('change', () => { selectedDay = ''; loadEvents(); });
@@ -413,7 +424,7 @@
     $('#eventForm').addEventListener('submit', async event => {
       event.preventDefault(); const button = $('#eventForm button[type="submit"]'); button.disabled = true;
       const payload = { slug: $('#eventSlug').value, title: $('#eventTitle').value, city_slug: $('#eventCity').value, place_slug: $('#eventPlace').value || null, start_date: $('#eventStart').value, end_date: $('#eventEnd').value, description: $('#eventDescription').value, source_url: $('#eventSourceUrl').value, source_name: $('#eventSourceName').value, verified_on: $('#eventVerified').value };
-      try { await app.fetchJson('/api/admin/events' + ($('#eventId').value ? '/' + $('#eventId').value : ''), { method: $('#eventId').value ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); $('#eventDialog').close(); await loadEvents(); app.showToast('Etkinlik kaydedildi.'); }
+      try { await app.fetchJson('/api/admin/events' + ($('#eventId').value ? '/' + $('#eventId').value : ''), { method: $('#eventId').value ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); $('#eventDialog').close(); await loadEvents(); app.showToast(I18N.text('Etkinlik kaydedildi.')); }
       catch (error) { $('#eventMessage').textContent = error.message; }
       finally { button.disabled = false; }
     });
@@ -433,14 +444,14 @@
       if (target.dataset.routeShare) shareRoute(Number(target.dataset.routeShare));
       if (target.dataset.eventDay) { selectedDay = target.dataset.eventDay; renderCalendar(); renderEvents(); }
       if (target.dataset.eventEdit) openEvent(events.find(item => item.id === Number(target.dataset.eventEdit)));
-      if (target.dataset.eventDelete && confirm('Bu etkinliği silmek istiyor musun?')) {
+      if (target.dataset.eventDelete && confirm(I18N.text('Bu etkinliği silmek istiyor musun?'))) {
         try { await app.fetchJson('/api/admin/events/' + target.dataset.eventDelete, { method: 'DELETE' }); await loadEvents(); }
         catch (error) { app.showToast(error.message); }
       }
     });
-    Promise.allSettled([loadCities(), loadTemplates(), loadEvents()]).then(results => { if (results[0].status === 'rejected') app.showToast('Şehirler yüklenemedi. Sunucuyu yeniden başlatıp sayfayı yenile.'); });
+    Promise.allSettled([loadCities(), loadTemplates(), loadEvents()]).then(results => { if (results[0].status === 'rejected') app.showToast(I18N.text('Şehirler yüklenemedi. Sunucuyu yeniden başlatıp sayfayı yenile.')); });
     const match = location.pathname.match(/^\/r\/([A-Za-z0-9_-]{20,64})\/?$/);
-    if (match) app.fetchJson('/api/shared-routes/' + match[1]).then(route => openRouteView(route, true)).catch(error => { $('#routeViewTitle').textContent = 'Rota açılamadı.'; $('#routeViewDescription').textContent = error.message; $('#routeViewStats').innerHTML = ''; $('#routeViewStops').innerHTML = ''; $('#routeViewWalking').disabled = true; $('#routeViewCopy').hidden = true; $('#routeViewDialog').showModal(); });
+    if (match) app.fetchJson('/api/shared-routes/' + match[1]).then(route => openRouteView(route, true)).catch(error => { $('#routeViewTitle').textContent = I18N.text('Rota açılamadı.'); $('#routeViewDescription').textContent = error.message; $('#routeViewStats').innerHTML = ''; $('#routeViewStops').innerHTML = ''; $('#routeViewWalking').disabled = true; $('#routeViewCopy').hidden = true; $('#routeViewDialog').showModal(); });
   }
   window.GuideFeatures = { init, previewRoute: openRouteView, statsMarkup, placesChanged, detailsChanged, sessionChanged, selectionChanged, populateAdmin, adminPayload, resetFilters, openJournal };
 })();
