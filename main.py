@@ -22,6 +22,7 @@ from pydantic import BaseModel, Field
 from guide_features import upgrade_database, install_features, route_metrics
 from guide_budget import upgrade_budget_database, install_budget
 from guide_day_planner import install_day_planner
+from guide_trip import upgrade_trip_database, install_trip, sync_trip_progress
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -387,6 +388,7 @@ def initialize_database() -> None:
 
         upgrade_database(db)
         upgrade_budget_database(db)
+        upgrade_trip_database(db)
 
 
 initialize_database()
@@ -884,6 +886,7 @@ def update_route(route_id: int, payload: RouteWrite, request: Request) -> dict:
             "INSERT INTO route_places (route_id, place_id, position) VALUES (?, ?, ?)",
             [(route_id, place_id, index) for index, place_id in enumerate(place_ids)],
         )
+        sync_trip_progress(db, route_id, utc_now())
         row = db.execute(
             "SELECT id, title, notes, created_at, updated_at FROM routes WHERE id = ?", (route_id,)
         ).fetchone()
@@ -996,3 +999,4 @@ def admin_delete_place(slug: str, request: Request) -> Response:
 install_features(app, sys.modules[__name__])
 install_budget(app, sys.modules[__name__])
 install_day_planner(app, sys.modules[__name__])
+install_trip(app, sys.modules[__name__])

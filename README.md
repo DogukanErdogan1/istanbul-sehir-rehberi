@@ -175,3 +175,18 @@ Plan oluşturmak için giriş gerekmez. Kaydetmek için giriş yaptığında ön
 Ziyaret süreleri editoryal tahmindir. Geçişler kuş uçuşu mesafeye dayalı yaklaşık sürelerdir; gerçek yürüyüş güzergâhı ve erişilebilirliği doğrulanmış değildir. İlk durağa ulaşım ve dönüş dahil değildir. Açılış/kapanış saatleri, kapalı günler ve güncel ücretler kontrol edilmez; sonuçlarda durakların resmî kaynak bağlantıları bulunur. Uygun durak veya yeterli süre bulunmazsa filtreler sessizce gevşetilmez; kullanıcı tercihlerini değiştirmeye yönlendirilir.
 
 API kontrolleri `tests/test_day_planner.py` dosyasındadır. Giriş sonrası önerinin korunması, kaydetme ve form akışı için bağımlılık gerektirmeyen kontrol: `node tests/test_day_planner_ui.cjs`. Bu kontrol gerçek tarayıcıda görsel doğrulama yerine geçmez.
+
+
+## Geziye başla modu
+
+Rotalarım sayfasındaki **Geziye başla** düğmesi veya kayıtlı rotanın ayrıntılarındaki aynı düğme gezi modunu açar. Telefonda tam ekran, bilgisayarda odaklanmış bir gezi ekranı görünür. İlk kez **Geziye başla**, mola sonrası **Kaldığım yerden devam et**, her ziyaretten sonra **Bu durağı tamamladım** düğmesini kullan. Tamamlanan ve bekleyen duraklar, sıradaki durak ve kalan tahmini süre gösterilir. Yanlış tamamlanan bir durak **Geri al** ile tekrar sıraya eklenebilir; tamamlanmış bir gezide bu işlem geziyi molaya alır. **Baştan başlat** işlemi onay ister ve yalnızca o rotanın gezi ilerlemesini sıfırlar.
+
+İlerleme, oturum açmış kullanıcının rotasına bağlı olarak sunucuda saklanır. Ekranı kapatmak ilerlemeyi silmez; tekrar açarken son durum yüklenir. Paylaşılan rota bağlantıları gezi ilerlemesini göstermez. Demo hesabını kullananlar aynı hesabın ilerlemesini paylaşır. Gezi notları Günlüğüm bölümünden ayrıca eklenir.
+
+Duraklar elle tamamlanır. Süre, kalan durakların önerilen ziyaret süreleri ile kuş uçuşu mesafeden türetilen yaklaşık geçişlerin toplamıdır; bir geri sayım veya doğrulanmış yürüyüş hesabı değildir. Geçiş hesabı için gerekli konum bilgisi eksikse yalnızca ziyaret süreleri gösterilir. İlk durağa mevcut konumundan ulaşım, molalar ve dönüş dahil değildir. **Yol tarifi** bağlantısı Google Haritalar'ı seçili durağın konumuyla açar; uygulama kullanıcının konumunu talep etmez veya kaydetmez. Durağın konumu eksikse isim/adresle harita araması açılır.
+
+Başlangıçta `route_trips` ve `route_trip_stops` tabloları mevcut kayıtlar korunarak oluşturulur. Rota düzenlendiğinde kalan durakların tamamlanma kayıtları korunur, çıkarılanların kayıtları temizlenir. Tamamlanmış rotaya yeni bir durak eklemek geziyi molaya alır; **Devam et** ile sürdürülür. Rotayı silmek o rotanın ilerleme kayıtlarını da siler. Yeni sürüme geçerken sunucuyu yeniden başlat.
+
+API: `GET /api/routes/{route_id}/trip`, `POST /api/routes/{route_id}/trip`. POST için `action` (`start`, `pause`, `resume`, `complete_stop`, `undo_stop`, `restart`) ve GET cevabındaki `expected_revision` gönderilir. Durak işlemleri ayrıca `place_slug` ister. Eski sürümle yapılan işlem `409` döndürür; ekran güncel durumu yükler, işlemi kendiliğinden tekrar uygulamaz. Sonucu alınamayan bir istekte işlem düğmeleri son durum tekrar yüklenene kadar kilitlenir.
+
+Kontroller: `python -m unittest discover -s tests -v`, `node tests/test_trip_ui.cjs` ve `node tests/test_day_planner_ui.cjs`. Gezi API'si testleri `tests/test_trip.py` dosyasındadır. Kod üzerinden form/etkileşim kontrolleri gerçek tarayıcıda görsel doğrulama yerine geçmez.

@@ -17,11 +17,13 @@
     <script src="/static/budget.js?v=budget-1" defer></script>
     <link rel="stylesheet" href="/static/day-planner.css?v=day-plan-1" />
     <script src="/static/day-planner.js?v=day-plan-1" defer></script>
+    <link rel="stylesheet" href="/static/trip.css?v=trip-1" />
+    <script src="/static/trip.js?v=trip-1" defer></script>
     <script src="/static/photos.js?v=kultur-3-1" defer></script>
     <script src="/static/city-photos.js?v=guide-2-1" defer></script>
     <script src="/static/vendor/leaflet/leaflet.js" defer></script>
-    <script src="/static/features.js?v=day-plan-1" defer></script>
-    <script src="/static/app.js?v=day-plan-1" defer></script>
+    <script src="/static/features.js?v=trip-1" defer></script>
+    <script src="/static/app.js?v=trip-1" defer></script>
   </head>
   <body>
     <svg class="svg-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -223,7 +225,7 @@
         <p class="form-message" id="adminMessage" role="status"></p>
       </form>
     </dialog>
-    <dialog class="form-dialog wide-dialog" id="routeViewDialog" aria-labelledby="routeViewTitle"><button class="form-dialog-close" type="button" data-close="routeViewDialog" aria-label="Pencereyi kapat">×</button><p class="eyebrow" id="routeViewEyebrow">GEZİ PLANI</p><h2 id="routeViewTitle">Rota.</h2><p id="routeViewDescription" class="section-intro"></p><div id="routeViewStats" class="estimate-box" aria-live="polite"></div><ol id="routeViewStops" class="route-stop-list"></ol><div class="feature-actions"><button id="routeViewWalking" class="button button-dark" type="button">Yürüyüş yolunu hesapla</button><button id="routeViewBudget" class="text-button" type="button" hidden>Bütçeyi aç ↗</button><button id="routeViewCopy" class="text-button" type="button">Bu rotayı kendime ekle ↗</button></div><div id="routeViewMap" class="route-map" role="region" aria-label="Gezi rotası haritası"></div><p class="small-note">Harita: © OpenStreetMap katkıda bulunanlar · Rota: OSRM / FOSSGIS · <a href="https://www.openstreetmap.org/fixthemap" target="_blank" rel="noopener">Harita hatası bildir</a></p></dialog>
+    <dialog class="form-dialog wide-dialog" id="routeViewDialog" aria-labelledby="routeViewTitle"><button class="form-dialog-close" type="button" data-close="routeViewDialog" aria-label="Pencereyi kapat">×</button><p class="eyebrow" id="routeViewEyebrow">GEZİ PLANI</p><h2 id="routeViewTitle">Rota.</h2><p id="routeViewDescription" class="section-intro"></p><div id="routeViewStats" class="estimate-box" aria-live="polite"></div><ol id="routeViewStops" class="route-stop-list"></ol><div class="feature-actions"><button id="routeViewTrip" class="button button-coral" type="button" hidden>Geziye başla ↗</button><button id="routeViewWalking" class="button button-dark" type="button">Yürüyüş yolunu hesapla</button><button id="routeViewBudget" class="text-button" type="button" hidden>Bütçeyi aç ↗</button><button id="routeViewCopy" class="text-button" type="button">Bu rotayı kendime ekle ↗</button></div><div id="routeViewMap" class="route-map" role="region" aria-label="Gezi rotası haritası"></div><p class="small-note">Harita: © OpenStreetMap katkıda bulunanlar · Rota: OSRM / FOSSGIS · <a href="https://www.openstreetmap.org/fixthemap" target="_blank" rel="noopener">Harita hatası bildir</a></p></dialog>
 
     <dialog class="form-dialog wide-dialog" id="shareDialog" aria-labelledby="shareTitle"><button class="form-dialog-close" type="button" data-close="shareDialog" aria-label="Pencereyi kapat">×</button><p class="eyebrow">AYNI YOLDA BULUŞALIM</p><h2 id="shareTitle">Rotanı paylaş.</h2><p class="section-intro">Bağlantıyı bilenler rota adını ve durakları görebilir. Özel notların paylaşılmaz. Rotayı düzenlediğinde paylaşılan görünüm de güncellenir.</p><label class="form-field"><span>Paylaşım bağlantısı</span><input id="shareUrl" type="url" readonly /></label><p id="shareHint" class="small-note"></p><div class="feature-actions"><button class="button button-dark" id="copyShareButton" type="button">Bağlantıyı kopyala</button><button class="text-button" id="revokeShareButton" type="button">Paylaşımı kapat</button></div><p id="shareMessage" class="form-message" role="status"></p></dialog>
 
@@ -277,6 +279,27 @@
         <div class="day-planner-output"><p id="plannerStatus" class="day-planner-status" role="status" aria-live="polite"></p>
           <div id="plannerPlaceholder" class="day-planner-placeholder"><svg viewBox="0 0 210 120" fill="none" aria-hidden="true"><path d="M18 92C30 12 63 109 104 53S162 12 191 49" stroke="currentColor" stroke-width="2" stroke-dasharray="6 7"/><circle cx="18" cy="92" r="7" fill="#dc2d1d"/><path d="m179 47 12 2-3-13" stroke="currentColor" stroke-width="2"/></svg><h3>Güzel bir gün,<br />küçük bir planla başlar.</h3><p>Tercihlerini seçtiğinde saat saat önerilerin burada görünecek.</p></div>
           <div id="plannerResult" hidden><div class="day-planner-result-heading"><p class="eyebrow">SANA GÖRE BİR BAŞLANGIÇ</p><h3 id="plannerResultTitle"></h3><p id="plannerResultWindow"></p></div><div id="plannerSummary" class="day-planner-summary"></div><p id="plannerTimingNote" class="day-planner-timing"></p><ol id="plannerTimeline" class="day-planner-timeline"></ol><div class="day-planner-notes"><strong>Yola çıkmadan önce</strong><ul id="plannerNotes"></ul></div><div class="day-planner-save"><div class="form-field"><label for="plannerRouteTitle">Rotanın adı</label><input id="plannerRouteTitle" minlength="3" maxlength="70" /></div><div class="day-planner-actions"><button id="plannerSave" class="button button-dark" type="button">Rotalarıma kaydet +</button><button id="plannerMap" class="text-button" type="button">Haritada incele ↗</button><a id="plannerSavedLink" class="text-link" href="/static/rotalarim.html" hidden>Rotalarıma git ↗</a></div></div></div>
+        </div>
+      </div>
+    </dialog>
+
+
+    <dialog class="form-dialog trip-dialog" id="tripDialog" aria-labelledby="tripTitle">
+      <header class="trip-header"><button class="form-dialog-close" data-close="tripDialog" type="button" aria-label="Gezi modunu kapat">×</button><p class="eyebrow">ADIM ADIM ŞEHİR ARASI</p><h2 id="tripTitle">Geziye <em>başla.</em></h2><p id="tripRouteName" class="trip-route-name"></p></header>
+      <div class="trip-content"><p id="tripStatus" class="trip-status" role="status" aria-live="polite"></p><button id="tripRetry" class="text-button" type="button" hidden>Son durumu yükle ↗</button>
+        <div id="tripData" hidden>
+          <div id="tripEmpty" class="trip-empty" hidden><h3>Bu rotada durak kalmamış.</h3><p>Rotalarım sayfasından rotanı düzenleyip yeni duraklar ekleyebilirsin.</p><a class="text-link" href="/static/rotalarim.html">Rotalarıma dön ↗</a></div>
+          <div id="tripJourney">
+            <div class="trip-progress-heading"><strong id="tripStateLabel"></strong><span id="tripProgressLabel"></span></div><progress id="tripProgress" max="100" value="0" aria-label="Rotadaki tamamlanan durakların yüzdesi"></progress>
+            <div class="trip-metrics"><div><strong id="tripRemainingTime">—</strong><span id="tripTimeLabel">tahmini kalan süre</span></div><div><strong id="tripRemainingCount">—</strong><span>kalan durak</span></div></div>
+            <article class="trip-current-stop" id="tripCurrentStop"><div class="trip-stop-photo" id="tripStopPhoto"></div><div class="trip-stop-copy"><p class="eyebrow" id="tripNextLabel">SIRADAKİ DURAK</p><h3 id="tripStopTitle" tabindex="-1"></h3><p id="tripStopLocation" class="trip-stop-location"></p><p id="tripStopSummary" class="trip-stop-summary"></p><span id="tripVisitDuration" class="trip-visit-duration"></span><div class="trip-stop-links"><a id="tripDirections" target="_blank" rel="noopener">Yol tarifi ↗</a><button id="tripDetails" class="text-button" type="button">Durağı keşfet ↗</button></div></div></article>
+            <section id="tripFinished" class="trip-finished" aria-labelledby="tripFinishedTitle" hidden><span class="trip-finish-mark" aria-hidden="true">✓</span><p class="eyebrow">BU YOLUN DA BİR HİKÂYESİ OLDU</p><h3 id="tripFinishedTitle" tabindex="-1">Güzel bir gün daha.</h3><p id="tripFinishedText"></p><span class="handnote">Yeni yollarda görüşürüz.</span><a class="text-link" href="/static/rotalarim.html">Rotalarıma dön ↗</a></section>
+            <div class="trip-main-actions"><button id="tripPrimary" class="button button-coral" type="button">Geziye başla ↗</button><button id="tripPause" class="text-button" type="button" hidden>Mola ver</button></div>
+            <p class="trip-save-note">İlerlemen bu rotaya özel olarak hesabına kaydedilir. Ekranı kapattıktan sonra kaldığın yerden devam edebilirsin.</p>
+            <section class="trip-checkpoints" aria-labelledby="tripCheckpointsTitle"><div class="trip-checkpoints-heading"><h3 id="tripCheckpointsTitle">Yolun hikâyesi.</h3><span class="handnote">Bir durak daha.</span></div><ol id="tripStops"></ol></section>
+            <p id="tripEstimateNote" class="trip-estimate-note"></p>
+            <div class="trip-restart"><button id="tripRestart" class="text-button" type="button" hidden>Baştan başlat</button><div id="tripRestartConfirm" class="trip-restart-confirm" hidden><p>Bu rotanın tamamlanan duraklarını sıfırlayıp geziyi yeniden başlatmak istiyor musun?</p><button id="tripConfirmRestart" class="button button-dark" type="button">Evet, baştan başlat</button><button id="tripCancelRestart" class="text-button" type="button">Vazgeç</button></div></div>
+          </div>
         </div>
       </div>
     </dialog>
