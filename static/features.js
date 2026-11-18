@@ -39,7 +39,8 @@
       maxZoom: 19, attribution: I18N.text('&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> katkıda bulunanlar'),
     }).addTo(map);
     tiles.on('tileerror', () => {
-      if (id === 'discoveryMap') $('#mapStatus').textContent = I18N.text('Harita zemini yüklenemedi. İnternet bağlantını kontrol et; durak noktaları seçilebilir.');
+      if (id === 'discoveryMap') $('#mapStatus').textContent = window.GuideOffline?.isOffline() ?
+        window.GuideOffline.copy.map : I18N.text('Harita zemini yüklenemedi. İnternet bağlantını kontrol et; durak noktaları seçilebilir.');
     });
     return map;
   }
@@ -66,6 +67,7 @@
     places.forEach((place, index) => window.L.marker([place.latitude, place.longitude], { icon: pin(index) }).addTo(discoveryMarkers).bindTooltip(h(place.name)).on('click', () => selectMapPlace(place)));
     fitMap(discoveryMap, places);
     $('#mapStatus').textContent = I18N.html`${places.length} durak haritada.${places.length < matchingPlaces.length ? I18N.text(' Konumu eksik duraklar yalnızca kartlarda gösterilir.') : ''} Noktalar yaklaşık konumlardır; giriş kapısını göstermeyebilir.`;
+    if (window.GuideOffline?.isOffline()) $('#mapStatus').textContent += ' ' + window.GuideOffline.copy.map;
     $('#resultCount').textContent = I18N.html`${places.length} durak haritada`;
     $('#showAllPlaces').hidden = true;
     $('#mapPlaceCard').innerHTML = I18N.text('<p>Haritadaki bir durağı seç.</p>');
@@ -311,7 +313,12 @@
       if (request !== eventRequest) return;
       events = result.items;
       renderCalendar(); renderEvents();
-    } catch (error) { if (request === eventRequest) { events = []; $('#eventsGrid').innerHTML = errorBox(error.message); renderCalendar(); } }
+    } catch (error) {
+      if (request !== eventRequest) return;
+      events = [];
+      $('#eventsGrid').innerHTML = errorBox(error.message);
+      $('#eventCalendar').replaceChildren();
+    }
   }
   function renderCalendar() {
     const month = $('#eventMonth').value;
@@ -449,6 +456,7 @@
         catch (error) { app.showToast(error.message); }
       }
     });
+    window.addEventListener('online', () => { Promise.allSettled([loadCities(), loadTemplates(), loadEvents()]); });
     Promise.allSettled([loadCities(), loadTemplates(), loadEvents()]).then(results => { if (results[0].status === 'rejected') app.showToast(I18N.text('Şehirler yüklenemedi. Sunucuyu yeniden başlatıp sayfayı yenile.')); });
     const match = location.pathname.match(/^\/r\/([A-Za-z0-9_-]{20,64})\/?$/);
     if (match) app.fetchJson('/api/shared-routes/' + match[1]).then(route => openRouteView(route, true)).catch(error => { $('#routeViewTitle').textContent = I18N.text('Rota açılamadı.'); $('#routeViewDescription').textContent = error.message; $('#routeViewStats').innerHTML = ''; $('#routeViewStops').innerHTML = ''; $('#routeViewWalking').disabled = true; $('#routeViewCopy').hidden = true; $('#routeViewDialog').showModal(); });

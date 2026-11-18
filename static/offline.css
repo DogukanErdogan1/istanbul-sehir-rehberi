@@ -1,0 +1,11 @@
+.offline-panel { margin-block: 0 12px; font-size: 12px; }
+.offline-banner { margin: 0 0 10px; padding: 12px 14px; border-left: 3px solid var(--blue); background: #eee8dc; line-height: 1.6; }
+.offline-download { width: min(100%, 485px); }
+.offline-download summary { padding-block: 8px; cursor: pointer; color: var(--coral-dark); font-weight: 800; width: fit-content; }
+.offline-download-body { border: 1px solid var(--line); border-radius: 6px; padding: 14px; background: var(--paper); }
+.offline-download-body p { margin: 0 0 10px; line-height: 1.6; }
+.offline-download-body p:empty { display: none; }
+.offline-download-body #offlineFeedback { margin: 10px 0 0; }
+.offline-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.offline-actions .button { min-height: 38px; padding: 8px 13px; }
+.offline-actions button:disabled { opacity: .55; cursor: default; }

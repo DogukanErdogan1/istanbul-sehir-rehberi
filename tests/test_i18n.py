@@ -140,6 +140,34 @@ class LanguageTests(unittest.TestCase):
         self.assertEqual(bad.json()["detail"][0]["msg"], "Select each interest only once.")
         self.assertEqual(bad.json()["detail"][0]["input"]["city"], "istanbul")
 
+    def test_offline_pack_is_public_bilingual_and_has_all_template_stops(self):
+        self.new_route()
+        guest = TestClient(main.app)
+        try:
+            en = self.client.get("/api/offline-guide?lang=en")
+            public = guest.get("/api/offline-guide?lang=en")
+            tr = guest.get("/api/offline-guide?lang=tr")
+            worker = guest.get("/offline-worker.js")
+        finally:
+            guest.close()
+        self.assertEqual((en.status_code, public.status_code, tr.status_code), (200, 200, 200))
+        self.assertEqual((en.headers["content-language"], tr.headers["content-language"]), ("en", "tr"))
+        member, anonymous = en.json(), public.json()
+        member.pop("downloaded_at")
+        anonymous.pop("downloaded_at")
+        self.assertEqual(member, anonymous)
+        self.assertEqual(set(member), {"version", "cities", "categories", "places", "templates"})
+        self.assertEqual({city["slug"] for city in member["cities"]}, {"istanbul", "ankara", "izmir"})
+        en_names = {place["slug"]: place["name"] for place in member["places"]}
+        self.assertEqual(len(en_names), len(CATALOG["places"]))
+        self.assertEqual(en_names["yerebatan-sarnici"], "Basilica Cistern")
+        self.assertTrue(any(p["name"] == "Yerebatan Sarnıcı" for p in tr.json()["places"]))
+        for template in member["templates"]:
+            self.assertEqual(template["places"], [next(p for p in member["places"] if p["slug"] == slug) for slug in template["place_slugs"]])
+        self.assertEqual(worker.status_code, 200)
+        self.assertIn("javascript", worker.headers["content-type"])
+        self.assertEqual(worker.headers["cache-control"], "no-cache")
+
 
 if __name__ == "__main__":
     unittest.main()

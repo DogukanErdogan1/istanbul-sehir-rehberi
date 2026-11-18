@@ -194,6 +194,20 @@ def install_features(app, core):
         lookup = {row["slug"]: core._as_place(row) for row in rows}
         return [lookup[slug] for slug in slugs]
 
+    def city_rows(db):
+        return [dict(row) for row in db.execute("SELECT c.*,COUNT(p.id) AS place_count FROM cities c LEFT JOIN places p ON p.city_slug=c.slug GROUP BY c.slug ORDER BY CASE c.slug WHEN 'istanbul' THEN 0 WHEN 'ankara' THEN 1 ELSE 2 END")]
+
+    def route_templates(places):
+        lookup = {place["slug"]: place for place in places}
+        items = []
+        for template in ROUTE_TEMPLATES:
+            stops = [lookup[slug] for slug in template["place_slugs"]
+                     if slug in lookup and lookup[slug]["city_slug"] == template["city_slug"]]
+            if stops:
+                items.append({**template, "place_slugs": [stop["slug"] for stop in stops],
+                              "places": stops, "metrics": route_metrics(stops)})
+        return items
+
     @app.get("/r/{token}", include_in_schema=False)
     def shared_page(token: str, request: Request):
         return core.home(request)
@@ -201,23 +215,26 @@ def install_features(app, core):
     @app.get("/api/cities")
     def cities():
         with core.db_session() as db:
-            return [dict(row) for row in db.execute("SELECT c.*,COUNT(p.id) AS place_count FROM cities c LEFT JOIN places p ON p.city_slug=c.slug GROUP BY c.slug ORDER BY CASE c.slug WHEN 'istanbul' THEN 0 WHEN 'ankara' THEN 1 ELSE 2 END")]
+            return city_rows(db)
 
     @app.get("/api/route-templates")
     def templates(city: str = "istanbul"):
-        items = []
         with core.db_session() as db:
             validate_city(db, city)
-            for template in ROUTE_TEMPLATES:
-                if template["city_slug"] != city:
-                    continue
-                available = {row["slug"] for row in db.execute("SELECT slug FROM places WHERE city_slug=?", (city,))}
-                slugs = [slug for slug in template["place_slugs"] if slug in available]
-                if not slugs:
-                    continue
-                places = load_places(db, slugs)
-                items.append({**template, "places": places, "metrics": route_metrics(places)})
-        return {"items": items}
+            rows = db.execute(core._place_select() + " WHERE p.city_slug=? GROUP BY p.id", (city,)).fetchall()
+        return {"items": route_templates(core._as_place(row) for row in rows)}
+
+    @app.get("/api/offline-guide")
+    def offline_guide():
+        # This response never depends on a login or includes account data or review text.
+        with core.db_session() as db:
+            db.execute("BEGIN")
+            cities = city_rows(db)
+            categories = [dict(row) for row in db.execute("SELECT slug,name FROM categories ORDER BY id")]
+            rows = db.execute(core._place_select() + " GROUP BY p.id ORDER BY p.name COLLATE NOCASE").fetchall()
+            places = [core._as_place(row) for row in rows]
+        return {"version": 1, "downloaded_at": core.utc_now(), "cities": cities,
+                "categories": categories, "places": places, "templates": route_templates(places)}
 
     @app.post("/api/route-estimate")
     def estimate(payload: EstimateWrite):

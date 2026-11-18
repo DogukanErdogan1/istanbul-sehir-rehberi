@@ -24,9 +24,11 @@
     <script src="/static/photos.js?v=kultur-3-1" defer></script>
     <script src="/static/city-photos.js?v=guide-2-1" defer></script>
     <script src="/static/vendor/leaflet/leaflet.js" defer></script>
-    <script src="/static/features.js?v=languages-1" defer></script>
-    <script src="/static/app.js?v=languages-1" defer></script>
+    <script src="/static/offline.js?v=offline-1" defer></script>
+    <script src="/static/features.js?v=offline-1" defer></script>
+    <script src="/static/app.js?v=offline-1" defer></script>
     <link rel="stylesheet" href="/static/i18n.css?v=languages-1" />
+    <link rel="stylesheet" href="/static/offline.css?v=offline-1" />
   </head>
   <body>
     <svg class="svg-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -45,6 +47,22 @@
       <nav class="main-nav" aria-label="Ana menü" data-i18n-aria-label="Ana menü"><a href="/#places"><i18n-text data-i18n="Keşfet">Keşfet</i18n-text></a><a href="/rotalarim"><i18n-text data-i18n="Rotalarım">Rotalarım</i18n-text></a><a href="/gunlugum"><i18n-text data-i18n="Günlüğüm">Günlüğüm</i18n-text></a><a href="/#events"><i18n-text data-i18n="Takvim">Takvim</i18n-text></a></nav>
       <div class="header-actions"><label class="city-picker"><svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg><span class="sr-only"><i18n-text data-i18n="Şehir seç">Şehir seç</i18n-text></span><select id="citySelect"><option value="istanbul" data-i18n="İstanbul">İstanbul</option><option value="ankara">Ankara</option><option value="izmir" data-i18n="İzmir">İzmir</option></select></label><div class="language-switch" role="group" aria-label="Dil seç" data-i18n-aria-label="Dil seç"><button type="button" data-language="tr" lang="tr" aria-label="Türkçe" aria-pressed="true">TR</button><button type="button" data-language="en" lang="en" aria-label="English" aria-pressed="false">EN</button></div><button class="account-button" id="accountButton" type="button"><i18n-text data-i18n="Giriş yap">Giriş yap</i18n-text></button><button class="account-button demo-account-button" id="demoLoginButton" type="button" aria-label="Demo hesabı" hidden data-i18n-aria-label="Demo hesabı"><span class="demo-button-label"><i18n-text data-i18n="Demo hesabı">Demo hesabı</i18n-text></span><span class="demo-button-compact" aria-hidden="true">Demo</span></button></div>
     </header>
+
+    <aside class="offline-panel page-wrap">
+      <p id="offlineBanner" class="offline-banner" role="status" hidden></p>
+      <details class="offline-download">
+        <summary id="offlineTitle">Çevrimdışı rehber</summary>
+        <div class="offline-download-body">
+          <p id="offlineIntro"></p>
+          <p id="offlineTimestamp" hidden></p>
+          <div class="offline-actions">
+            <button id="offlineDownload" class="button button-dark" type="button" disabled>Rehberi indir</button>
+            <button id="offlineRemove" class="text-button" type="button" hidden>İndirmeyi kaldır</button>
+          </div>
+          <p id="offlineFeedback" role="status"></p>
+        </div>
+      </details>
+    </aside>
 
     <main id="top">
       <div class="personal-loading page-wrap" role="status"><span class="loading-line"></span><p><i18n-text data-i18n="Şehir defterin açılıyor…">Şehir defterin açılıyor…</i18n-text></p></div>

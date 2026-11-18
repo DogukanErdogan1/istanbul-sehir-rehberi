@@ -93,7 +93,8 @@
   async function fetchJson(url, options) {
     const headers = new Headers(options?.headers);
     headers.set("Accept-Language", I18N.language);
-    const response = await fetch(url, { ...options, headers });
+    const request = typeof window !== "undefined" && window.GuideOffline ? window.GuideOffline.request : fetch;
+    const response = await request(url, { ...options, headers });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
       const detail = typeof data.detail === "string" ? data.detail : Array.isArray(data.detail) && data.detail[0]?.msg ? data.detail[0].msg.replace(/^Value error,\s*/, "") : I18N.text("İşlem tamamlanamadı.");
@@ -273,7 +274,7 @@
     }
   }
 
-  function renderDetails({ place, reviews, user_has_reviewed: hasReviewed }) {
+  function renderDetails({ place, reviews, user_has_reviewed: hasReviewed, offline = false }) {
     const category = categoryNames.get(place.category_slug) || categoryArt[place.category_slug] || I18N.text("İSTANBUL");
     const mapsQuery = encodeURIComponent(`${place.name}, ${place.district}, ${place.city_name || I18N.text("İstanbul")}`);
     const reviewForm = !state.user
@@ -299,11 +300,12 @@
       </div>
       <div class="dialog-stats"><span class="dialog-stat">★ ${Number(place.average_rating).toFixed(1)} · ${place.review_count} yorum</span><span class="dialog-stat">◷ ${escapeHtml(place.duration)}</span><span class="dialog-stat">${escapeHtml(place.best_for)}</span></div>
       <p class="dialog-description">${escapeHtml(place.description)}</p>
-      <a class="dialog-map" href="https://www.google.com/maps/search/?api=1&query=${mapsQuery}" target="_blank" rel="noopener noreferrer">Haritada aç <span aria-hidden="true">↗</span></a>
+      ${offline ? "" : `<a class="dialog-map" href="https://www.google.com/maps/search/?api=1&query=${mapsQuery}" target="_blank" rel="noopener noreferrer">${I18N.text("Haritada aç")} <span aria-hidden="true">↗</span></a>`}
       <section class="review-section" aria-labelledby="reviewsTitle">
-        <div class="review-heading"><h3 id="reviewsTitle">Gezgin notları</h3><span>${reviews.length} yorum gösteriliyor</span></div>
+        ${offline ? `<h3 id="reviewsTitle">${escapeHtml(window.GuideOffline.copy.reviews)}</h3>` : `
+        <div class="review-heading"><h3 id="reviewsTitle">${I18N.text("Gezgin notları")}</h3><span>${reviews.length} ${I18N.text("yorum gösteriliyor")}</span></div>
         <div class="review-list">${reviews.length ? reviews.map(reviewMarkup).join("") : I18N.text('<p class="no-reviews">Henüz yorum yok. İlk notu sen bırak.</p>')}</div>
-        ${reviewForm}
+        ${reviewForm}`}
       </section>`;
     window.GuideFeatures?.detailsChanged(place);
   }
@@ -970,6 +972,9 @@
   window.GuideBudget?.init({ state, fetchJson, escapeHtml, showToast, openAuth });
   window.GuidePlanner?.init({ state, fetchJson, escapeHtml, showToast, openAuth, showDetails, loadRoutes });
   window.GuideTrip?.init({ state, fetchJson, escapeHtml, openAuth, showDetails });
+  window.addEventListener("online", () => {
+    Promise.allSettled([loadSession(), loadFilters(), loadCatalog(), loadPlaces()]);
+  });
   saveFavorites();
   renderAccountUi();
   Promise.allSettled([loadSession(), loadFilters(), loadCatalog()]).then(async () => {

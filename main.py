@@ -575,6 +575,12 @@ def home(request: Request) -> FileResponse:
     return FileResponse(STATIC_DIR / pages.get(request.url.path, "index.html"))
 
 
+@app.get("/offline-worker.js", include_in_schema=False)
+def offline_worker() -> FileResponse:
+    return FileResponse(STATIC_DIR / "offline-worker.js", media_type="text/javascript",
+                        headers={"Cache-Control": "no-cache"})
+
+
 @app.get("/api/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}

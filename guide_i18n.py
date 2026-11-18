@@ -143,6 +143,11 @@ def localize(path, data, status=200):
         for item in data["items"]:
             overlay(item, "templates")
             route(item)
+    elif path == "/api/offline-guide":
+        localize("/api/cities", data["cities"])
+        localize("/api/categories", data["categories"])
+        localize("/api/places", {"items": data["places"]})
+        localize("/api/route-templates", {"items": data["templates"]})
     elif path == "/api/events":
         for item in data["items"]:
             overlay(item, "events")
